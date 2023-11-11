@@ -19,11 +19,18 @@ import com.badlogic.gdx.utils.TimeUtils;
 public class GameScreen implements Screen {
     final TowerDefence game;
 
+    Texture background;
+    Texture menuBackground;
+
     Enemy enemy;
 
     OrthographicCamera camera;
     public GameScreen(final TowerDefence game) {
         this.game = game;
+
+        background = new Texture(Gdx.files.internal("LevelBackground.png"));
+
+        menuBackground = new Texture(Gdx.files.internal("MenuBackground.png"));
 
         //Setup Default Enemy
         enemy = new Enemy();
@@ -53,7 +60,9 @@ public class GameScreen implements Screen {
         // begin a new batch and draw the bucket and
         // all drops
         game.batch.begin();
+        game.batch.draw(background,0,0, 1920,1080);
         game.batch.draw(enemy.enemyImage, enemy.interactionBox.x, enemy.interactionBox.y,  enemy.interactionBox.width,  enemy.interactionBox.height);
+        game.batch.draw(menuBackground,1664,0);
         game.batch.end();
 
         enemy.interactionBox.x += 400 * Gdx.graphics.getDeltaTime();
