@@ -19,14 +19,26 @@ import com.badlogic.gdx.utils.TimeUtils;
 public class GameScreen implements Screen {
     final TowerDefence game;
 
+    Texture background;
+    Texture menuBackground;
+
     Enemy enemy;
+
+    int[] pathX = new int[]{-64,1062+32,1062,658-32,658,1664+64};
+    int[] pathY = new int[]{647,647,937+32,937,129-32,129};
+    int[] directionX = new int[]{300,0,-300,0,300};
+    int[] directionY = new int[]{0,300,0,-300,0};
 
     OrthographicCamera camera;
     public GameScreen(final TowerDefence game) {
         this.game = game;
 
+        background = new Texture(Gdx.files.internal("LevelBackground.png"));
+
+        menuBackground = new Texture(Gdx.files.internal("MenuBackground.png"));
+
         //Setup Default Enemy
-        enemy = new Enemy();
+        enemy = new Enemy(pathX,pathY,directionX,directionY);
 
         // create the camera and the SpriteBatch
         camera = new OrthographicCamera();
@@ -53,14 +65,26 @@ public class GameScreen implements Screen {
         // begin a new batch and draw the bucket and
         // all drops
         game.batch.begin();
+        game.batch.draw(background,0,0, 1920,1080);
         game.batch.draw(enemy.enemyImage, enemy.interactionBox.x, enemy.interactionBox.y,  enemy.interactionBox.width,  enemy.interactionBox.height);
+        game.batch.draw(menuBackground,1664,0);
+        game.font.draw(game.batch, "Drops Collected: " + enemy.whatPoint, enemy.pathX[enemy.whatPoint + 1], enemy.pathY[enemy.whatPoint + 1]);
         game.batch.end();
 
-        enemy.interactionBox.x += 400 * Gdx.graphics.getDeltaTime();
+        enemy.interactionBox.x += enemy.directionX[enemy.whatPoint] * Gdx.graphics.getDeltaTime();
+        enemy.interactionBox.y += enemy.directionY[enemy.whatPoint] * Gdx.graphics.getDeltaTime();
 
-        if(enemy.interactionBox.x > 1920 + 64)
+        if(enemy.interactionBox.contains(enemy.pathX[enemy.whatPoint + 1],enemy.pathY[enemy.whatPoint + 1]))
         {
-            enemy.interactionBox.x = -64;
+            if(enemy.whatPoint + 1 == enemy.directionY.length)
+            {
+                enemy.whatPoint = 0;
+                enemy.interactionBox.x = enemy.pathX[enemy.whatPoint] - 32;
+                enemy.interactionBox.y = enemy.pathY[enemy.whatPoint] - 32;
+            }
+            else
+            enemy.whatPoint++;
+
         }
 
         // process user input
@@ -70,8 +94,7 @@ public class GameScreen implements Screen {
             camera.unproject(touchPos);
             if(enemy.interactionBox.contains(touchPos.x, touchPos.y))
             {
-                enemy.interactionBox.x = -64;
-                enemy.interactionBox.y = MathUtils.random(0, 1080-64);
+
             }
             //bucket.x = touchPos.x - 64 / 2;
         }
