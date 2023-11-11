@@ -10,6 +10,13 @@ public class Enemy {
     public int health;
     public Rectangle interactionBox;
 
+    public int[] pathX;
+    public int[] pathY;
+
+    public int[] directionX;
+    public int[] directionY;
+    public int whatPoint;
+
     public Enemy(){
         enemyImage = new Texture(Gdx.files.internal("BlueSquare.png"));
         health = 1;
@@ -18,6 +25,25 @@ public class Enemy {
         interactionBox.height = 64;
         interactionBox.x = 0;
         interactionBox.y = 1080/2;
+        directionX = new int[]{400};
+        directionY = new int[]{0};
+        whatPoint = 0;
+
+
+    }
+    public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY){
+        enemyImage = new Texture(Gdx.files.internal("BlueSquare.png"));
+        health = 1;
+        interactionBox = new Rectangle();
+        interactionBox.width = 64;
+        interactionBox.height = 64;
+        interactionBox.x = pathX[0] - 32;
+        interactionBox.y = pathY[0] - 32;
+        this.pathX = pathX;
+        this.pathY = pathY;
+        this.directionX = directionX;
+        this.directionY = directionY;
+        whatPoint = 0;
 
     }
     public Enemy(int health)
