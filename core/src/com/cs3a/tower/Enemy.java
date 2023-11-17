@@ -32,8 +32,8 @@ public class Enemy {
 
     }
     public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY){
-        enemyImage = new Texture(Gdx.files.internal("BlueSquare.png"));
         health = 1;
+        setEnemyImage();
         interactionBox = new Rectangle();
         interactionBox.width = 64;
         interactionBox.height = 64;
@@ -46,10 +46,20 @@ public class Enemy {
         whatPoint = 0;
 
     }
-    public Enemy(int health)
-    {
-        enemyImage = new Texture(Gdx.files.internal("BlueSquare.png"));
+    public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY,int health){
         this.health = health;
+        setEnemyImage();
+        interactionBox = new Rectangle();
+        interactionBox.width = 64;
+        interactionBox.height = 64;
+        interactionBox.x = pathX[0] - 32;
+        interactionBox.y = pathY[0] - 32;
+        this.pathX = pathX;
+        this.pathY = pathY;
+        this.directionX = directionX;
+        this.directionY = directionY;
+        whatPoint = 0;
+
     }
 
     public Enemy(int health, String texturePath)
@@ -58,5 +68,56 @@ public class Enemy {
         this.health = health;
     }
 
+    //Health should only be values of 3-0. Please don't set to anything but that. It shouldn't break but you
+    //never know
+    public void removeHealth() {
+        health--;
+        setEnemyImage();
+    }
+
+    public void setEnemyImage() {
+
+        if(this.health >= 3){
+            enemyImage = new Texture(Gdx.files.internal("RedSquare.png"));
+        }
+        else if(this.health == 2)
+        {
+            enemyImage = new Texture(Gdx.files.internal("PurpleSquare.png"));
+        }
+        else{
+            enemyImage = new Texture(Gdx.files.internal("BlueSquare.png"));
+        }
+
+
+    }
+    public int getHealth() {
+        return health;
+    }
+
+    public void setHealth(int health){
+        this.health = health;
+        setEnemyImage();
+
+    }
+
+    public void enemyAi(){
+        interactionBox.x += directionX[whatPoint] * Gdx.graphics.getDeltaTime();
+        interactionBox.y += directionY[whatPoint] * Gdx.graphics.getDeltaTime();
+
+        if(interactionBox.contains(pathX[whatPoint + 1],pathY[whatPoint + 1]))
+        {
+            if(whatPoint + 1 == directionY.length)
+            {
+                whatPoint = 0;
+                interactionBox.x = pathX[whatPoint] - 32;
+                interactionBox.y = pathY[whatPoint] - 32;
+            }
+            else
+                whatPoint++;
+
+        }
+
+
+    }
 
 }
