@@ -1,6 +1,7 @@
 package com.cs3a.tower;
 
 import java.util.Iterator;
+import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -22,13 +23,17 @@ public class GameScreen implements Screen {
     Texture background;
     Texture menuBackground;
 
-    Enemy enemy;
+    Array<Enemy> enemies;
+    long lastEnemySpwanTime;
 
     int[] pathX = new int[]{-64,1062+32,1062,658-32,658,1664+64};
     int[] pathY = new int[]{647,647,937+32,937,129-32,129};
     int[] directionX = new int[]{300,0,-300,0,300};
     int[] directionY = new int[]{0,300,0,-300,0};
 
+    Random rand;
+
+    int enemySpawnNumbers;
     OrthographicCamera camera;
     public GameScreen(final TowerDefence game) {
         this.game = game;
@@ -36,9 +41,13 @@ public class GameScreen implements Screen {
         background = new Texture(Gdx.files.internal("LevelBackground.png"));
 
         menuBackground = new Texture(Gdx.files.internal("MenuBackground.png"));
+        rand = new Random();
 
         //Setup Default Enemy
-        enemy = new Enemy(pathX,pathY,directionX,directionY);
+        enemies = new Array<Enemy>();
+        spawnEnemy(rand.nextInt(3) + 1);
+
+        enemySpawnNumbers = 10;
 
         // create the camera and the SpriteBatch
         camera = new OrthographicCamera();
@@ -66,40 +75,59 @@ public class GameScreen implements Screen {
         // all drops
         game.batch.begin();
         game.batch.draw(background,0,0, 1920,1080);
-        game.batch.draw(enemy.enemyImage, enemy.interactionBox.x, enemy.interactionBox.y,  enemy.interactionBox.width,  enemy.interactionBox.height);
+        for(Enemy enemy : enemies)
+        {
+            game.batch.draw(enemy.enemyImage, enemy.interactionBox.x, enemy.interactionBox.y,  enemy.interactionBox.width,  enemy.interactionBox.height);
+        }
+
         game.batch.draw(menuBackground,1664,0);
-        game.font.draw(game.batch, "Drops Collected: " + enemy.whatPoint, enemy.pathX[enemy.whatPoint + 1], enemy.pathY[enemy.whatPoint + 1]);
+        //game.font.draw(game.batch, "Drops Collected: " + enemy.whatPoint, enemy.pathX[enemy.whatPoint + 1], enemy.pathY[enemy.whatPoint + 1]);
         game.batch.end();
 
-        enemy.interactionBox.x += enemy.directionX[enemy.whatPoint] * Gdx.graphics.getDeltaTime();
-        enemy.interactionBox.y += enemy.directionY[enemy.whatPoint] * Gdx.graphics.getDeltaTime();
 
-        if(enemy.interactionBox.contains(enemy.pathX[enemy.whatPoint + 1],enemy.pathY[enemy.whatPoint + 1]))
+        Iterator<Enemy> iter = enemies.iterator();
+        while (iter.hasNext())
         {
-            if(enemy.whatPoint + 1 == enemy.directionY.length)
-            {
-                enemy.whatPoint = 0;
-                enemy.interactionBox.x = enemy.pathX[enemy.whatPoint] - 32;
-                enemy.interactionBox.y = enemy.pathY[enemy.whatPoint] - 32;
-            }
-            else
-            enemy.whatPoint++;
+            Enemy enemy = iter.next();
+
+            enemy.enemyAi();
+            if (Gdx.input.justTouched()) {
+                Vector3 touchPos = new Vector3();
+                touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                camera.unproject(touchPos);
+                if(enemy.interactionBox.contains(touchPos.x, touchPos.y))
+                {
+                    enemy.removeHealth();
+                    if(enemy.getHealth() <= 0)
+                    {
+                       iter.remove();
+                    }
+                }
 
         }
 
-        // process user input
-        if (Gdx.input.justTouched()) {
-            Vector3 touchPos = new Vector3();
-            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            camera.unproject(touchPos);
-            if(enemy.interactionBox.contains(touchPos.x, touchPos.y))
-            {
+            if (Gdx.input.justTouched()) {
+                Vector3 touchPos = new Vector3();
+                touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+                camera.unproject(touchPos);
+                }
 
+            if(TimeUtils.nanoTime() - lastEnemySpwanTime > 1000000000 && enemySpawnNumbers > 0){
+                spawnEnemy(rand.nextInt(3) + 1);
             }
-            //bucket.x = touchPos.x - 64 / 2;
+
+
         }
 
     }
+
+    private void spawnEnemy(int health) {
+        Enemy enemy = new Enemy(pathX,pathY,directionX,directionY,health);
+        enemies.add(enemy);
+        lastEnemySpwanTime = TimeUtils.nanoTime();
+        enemySpawnNumbers--;
+    }
+
 
     @Override
     public void resize(int width, int height) {
