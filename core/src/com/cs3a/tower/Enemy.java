@@ -2,6 +2,7 @@ package com.cs3a.tower;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 
 import java.awt.*;
 
@@ -16,10 +17,11 @@ public class Enemy {
     public int[] directionX;
     public int[] directionY;
     public int whatPoint;
+    private Vector2 position;
 
     public Enemy(){
         enemyImage = new Texture(Gdx.files.internal("BlueSquare.png"));
-        health = 1;
+        health = 3;
         interactionBox = new Rectangle();
         interactionBox.width = 64;
         interactionBox.height = 64;
@@ -33,7 +35,7 @@ public class Enemy {
     }
     public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY){
         enemyImage = new Texture(Gdx.files.internal("BlueSquare.png"));
-        health = 1;
+        health = 3;
         interactionBox = new Rectangle();
         interactionBox.width = 64;
         interactionBox.height = 64;
@@ -44,6 +46,7 @@ public class Enemy {
         this.directionX = directionX;
         this.directionY = directionY;
         whatPoint = 0;
+        position = new Vector2(pathX[0], pathY[0]);
 
     }
     public Enemy(int health)
@@ -58,5 +61,46 @@ public class Enemy {
         this.health = health;
     }
 
+    public Vector2 getPosition()
+    {
+        return position;
+    }
+
+    public int getHealth()
+    {
+        return health;
+    }
+
+    public void takeDamage(int damage)
+    {
+        health -= damage;
+    }
+
+    public boolean isAlive()
+    {
+        return health > 0;
+    }
+
+    public void updatePosition() {
+        if (whatPoint < directionX.length && whatPoint < directionY.length) {
+            position.x += directionX[whatPoint] * Gdx.graphics.getDeltaTime();
+            position.y += directionY[whatPoint] * Gdx.graphics.getDeltaTime();
+
+            if (interactionBox.contains(pathX[whatPoint + 1], pathY[whatPoint + 1])) {
+                if (whatPoint + 1 == directionY.length) {
+                    whatPoint = 0;
+                    interactionBox.x = pathX[whatPoint] - 32;
+                    interactionBox.y = pathY[whatPoint] - 32;
+                } else {
+                    whatPoint++;
+                }
+            }
+        }
+    }
+
+    public void dispose()
+    {
+        enemyImage.dispose();
+    }
 
 }
