@@ -30,7 +30,7 @@ public class Tower
 
     public void setPosition(float x, float y)
     {
-        position.set(x - (float) towerTexture.getWidth() /2, y - (float) towerTexture.getHeight() /2);
+        position.set(x - (float) towerTexture.getWidth() / 2, y - (float) towerTexture.getHeight() / 2);
     }
 
     public void render(SpriteBatch batch)
