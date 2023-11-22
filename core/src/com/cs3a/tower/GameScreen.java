@@ -1,10 +1,8 @@
 package com.cs3a.tower;
 
-import java.awt.*;
 import java.util.Iterator;
 import java.util.Random;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
@@ -12,68 +10,60 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.Gdx;
-
 
 public class GameScreen implements Screen {
     final TowerDefence game;
 
     Texture background;
     Texture menuBackground;
-    BitmapFont font;
+    Vector3 touchPos;
+    SpriteBatch batch;
 
     Array<Enemy> enemies;
     long lastEnemySpawnTime;
+    Array<Tower> towers;
+    boolean isPlacing;
 
-    int enemySpawnNumbers;
+    int[] pathX = new int[]{-64,1062+32,1062,658-32,658,1664+64};
+    int[] pathY = new int[]{647,647,937+32,937,129-32,129};
+    int[] directionX = new int[]{300,0,-300,0,300};
+    int[] directionY = new int[]{0,300,0,-300,0};
+
     Random rand;
 
-    int[] pathX = new int[]{-64, 1062 + 32, 1062, 658 - 32, 658, 1664 + 64};
-    int[] pathY = new int[]{647, 647, 937 + 32, 937, 129 - 32, 129};
-    int[] directionX = new int[]{300, 0, -300, 0, 300};
-    int[] directionY = new int[]{0, 300, 0, -300, 0};
-    public Array<Tower> towers;
-    public boolean isPlacing;
-    private Vector3 touchPos;
-    private SpriteBatch batch;
-
-
+    int enemySpawnNumbers;
     OrthographicCamera camera;
-
-    public GameScreen(final TowerDefence game)
-    {
+    public GameScreen(final TowerDefence game) {
         this.game = game;
-        rand = new Random();
 
         background = new Texture(Gdx.files.internal("LevelBackground.png"));
+
         menuBackground = new Texture(Gdx.files.internal("MenuBackground.png"));
+        rand = new Random();
+        touchPos = new Vector3();
         batch = new SpriteBatch();
-        font = new BitmapFont();
 
         //Setup Default Enemy
         enemies = new Array<Enemy>();
         spawnEnemy(rand.nextInt(3) + 1);
         enemySpawnNumbers = 10;
 
-        towers = new Array<>();
+        towers = new Array<Tower> ();
         isPlacing = true;
 
         Gdx.input.setInputProcessor(new TowerInputProcessor());
 
         // create the camera and the SpriteBatch
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 1920, 1080);
-        touchPos = new Vector3();
+        camera.setToOrtho(false,1920,1080);
+
     }
 
 
@@ -95,55 +85,58 @@ public class GameScreen implements Screen {
         // begin a new batch and draw the bucket and
         // all drops
         game.batch.begin();
-        game.batch.draw(background, 0, 0, 1920, 1080);
-        game.batch.draw(menuBackground, 1664, 0);
-        for (Enemy enemy : enemies)
+        game.batch.draw(background,0,0, 1920,1080);
+        for(Enemy enemy : enemies)
         {
-            game.batch.draw(enemy.enemyImage, enemy.interactionBox.x, enemy.interactionBox.y, enemy.interactionBox.width, enemy.interactionBox.height);
+            game.batch.draw(enemy.enemyImage, enemy.interactionBox.x, enemy.interactionBox.y,  enemy.interactionBox.width,  enemy.interactionBox.height);
         }
-        for (Tower tower : towers)
+
+        for(Tower tower: towers)
         {
             tower.render(batch);
         }
+
+        game.batch.draw(menuBackground,1664,0);
+        //game.font.draw(game.batch, "Drops Collected: " + enemy.whatPoint, enemy.pathX[enemy.whatPoint + 1], enemy.pathY[enemy.whatPoint + 1]);
         game.batch.end();
+
 
         Iterator<Enemy> iter = enemies.iterator();
         while (iter.hasNext())
         {
             Enemy enemy = iter.next();
-
-            // Call enemy AI for movement
             enemy.enemyAi();
 
-            // Towers targeting and damaging enemies
             for (Tower tower : towers)
             {
                 tower.attackUpdate(delta, enemy);
-                if (tower.isEnemyInRange(tower, enemy))
+                if(tower.isEnemyInRange(tower, enemy))
                 {
-                    enemy.takeDamage(tower.getDamage());
-                    int enemyHealth = enemy.getHealth();
+                    enemy.removeHealth(tower.getDamage());
 
-                    if (enemyHealth <= 0)
+                    if(enemy.getHealth() <= 0)
                     {
-                        // Enemy defeated actions
                         iter.remove();
                     }
                 }
             }
-        }
 
-// Spawning new enemies
-        if (TimeUtils.nanoTime() - lastEnemySpawnTime > 1000000000 && enemySpawnNumbers > 0)
-        {
-            spawnEnemy(rand.nextInt(3) + 1);
+            if(TimeUtils.nanoTime() - lastEnemySpawnTime > 1000000000 && enemySpawnNumbers > 0){
+                spawnEnemy(rand.nextInt(3) + 1);
+            }
+
         }
 
     }
 
+    private void spawnEnemy(int health)
+    {
+        Enemy enemy = new Enemy(pathX,pathY,directionX,directionY,health);
+        enemies.add(enemy);
+        lastEnemySpawnTime = TimeUtils.nanoTime();
+        enemySpawnNumbers--;
+    }
 
-    // private class creates tower each time it is clicked
-    // eventually needs cost of tower included (which also means a scoring system for defeating enemies)
     private class TowerInputProcessor extends com.badlogic.gdx.InputAdapter
     {
         public boolean touchDown(int screenX, int screenY, int pointer, int button)
@@ -152,20 +145,13 @@ public class GameScreen implements Screen {
             {
                 touchPos.set(screenX, screenY, 0);
                 camera.unproject(touchPos);
-                Tower tower = new Tower(1, 150,1000.0f);
+                Tower tower = new Tower(1, 150,1000000000);
                 tower.setPosition(touchPos.x, touchPos.y);
                 towers.add(tower);
                 return true;
             }
             return false;
         }
-    }
-    private void spawnEnemy(int health)
-    {
-        Enemy enemy = new Enemy(pathX,pathY,directionX,directionY,health);
-        enemies.add(enemy);
-        lastEnemySpawnTime = TimeUtils.nanoTime();
-        enemySpawnNumbers--;
     }
 
     @Override
@@ -191,15 +177,11 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-        for(Tower tower: towers)
-        {
-            tower.dispose();
-        }
+//        for(Tower tower: towers)
+//        {
+//            tower.dispose();
+//        }
 
-        for (Enemy enemy : enemies)
-        {
-            enemy.dispose();
-        }
 
     }
 }

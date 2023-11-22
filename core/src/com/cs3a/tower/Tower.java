@@ -79,9 +79,9 @@ public class Tower
         Vector2 towerPosition = tower.getPosition();
         Vector2 enemyPosition = enemy.getPosition();
 
-        double distance = towerPosition.dst(enemyPosition);
-        System.out.println("Distance is: " + distance);
-        return distance <= tower.getRange();
+       double distance = Math.sqrt(Math.pow(enemyPosition.x - towerPosition.x, 2) + Math.pow(enemyPosition.y - towerPosition.y, 2));
+       System.out.println("Distance is: " + distance);
+       return distance <= tower.getRange();
     }
 
     public void dispose()

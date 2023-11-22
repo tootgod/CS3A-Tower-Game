@@ -17,12 +17,11 @@ public class Enemy {
     public int[] directionX;
     public int[] directionY;
     public int whatPoint;
-    private Vector2 position;
 
-    public Enemy()
-    {
+
+    public Enemy(){
         enemyImage = new Texture(Gdx.files.internal("BlueSquare.png"));
-        health = 3;
+        health = 1;
         interactionBox = new Rectangle();
         interactionBox.width = 64;
         interactionBox.height = 64;
@@ -31,13 +30,10 @@ public class Enemy {
         directionX = new int[]{400};
         directionY = new int[]{0};
         whatPoint = 0;
-        position = new Vector2(pathX[0], pathY[0]);
     }
-    public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY)
-    {
-        health = 3;
-        // setEnemyImage();
-        enemyImage = new Texture(Gdx.files.internal("BlueSquare.png"));
+    public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY){
+        health = 1;
+        setEnemyImage();
         interactionBox = new Rectangle();
         interactionBox.width = 64;
         interactionBox.height = 64;
@@ -48,14 +44,11 @@ public class Enemy {
         this.directionX = directionX;
         this.directionY = directionY;
         whatPoint = 0;
-        position = new Vector2(pathX[0], pathY[0]);
 
     }
-    public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY,int health)
-    {
+    public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY,int health){
         this.health = health;
-        // setEnemyImage();
-        enemyImage = new Texture(Gdx.files.internal("BlueSquare.png"));
+        setEnemyImage();
         interactionBox = new Rectangle();
         interactionBox.width = 64;
         interactionBox.height = 64;
@@ -66,7 +59,7 @@ public class Enemy {
         this.directionX = directionX;
         this.directionY = directionY;
         whatPoint = 0;
-        position = new Vector2(pathX[0], pathY[0]);
+
     }
 
     public Enemy(int health, String texturePath)
@@ -75,63 +68,62 @@ public class Enemy {
         this.health = health;
     }
 
-    public void setEnemyImage()
-    {
-        if (this.health >= 3)
-        {
+    //Health should only be values of 3-0. Please don't set to anything but that. It shouldn't break but you
+    //never know
+    public void removeHealth(int damage) {
+        health -= damage;
+        System.out.println("current health: " + health);
+        setEnemyImage();
+    }
+
+    public void setEnemyImage() {
+
+        if(this.health >= 3){
             enemyImage = new Texture(Gdx.files.internal("RedSquare.png"));
         }
-        else if (this.health == 2)
+        else if(this.health == 2)
         {
             enemyImage = new Texture(Gdx.files.internal("PurpleSquare.png"));
         }
-        else
-        {
+        else{
             enemyImage = new Texture(Gdx.files.internal("BlueSquare.png"));
         }
-    }
-        public Vector2 getPosition()
-    {
-        return position;
-    }
 
-    public int getHealth()
-    {
+
+    }
+    public int getHealth() {
         return health;
     }
 
-
-    public void takeDamage(int damage)
-    {
-        health -= damage;
+    public void setHealth(int health){
+        this.health = health;
         setEnemyImage();
 
     }
 
-    public void enemyAi()
-    {
-        if (whatPoint < directionX.length && whatPoint < directionY.length)
-        {
-            position.x += directionX[whatPoint] * Gdx.graphics.getDeltaTime();
-            position.y += directionY[whatPoint] * Gdx.graphics.getDeltaTime();
+    public void enemyAi(){
+        interactionBox.x += directionX[whatPoint] * Gdx.graphics.getDeltaTime();
+        interactionBox.y += directionY[whatPoint] * Gdx.graphics.getDeltaTime();
 
-            if (interactionBox.contains(pathX[whatPoint + 1], pathY[whatPoint + 1]))
+        if(interactionBox.contains(pathX[whatPoint + 1],pathY[whatPoint + 1]))
+        {
+            if(whatPoint + 1 == directionY.length)
             {
-                if (whatPoint + 1 == directionY.length)
-                {
-                    whatPoint = 0;
-                    interactionBox.x = pathX[whatPoint] - 32;
-                    interactionBox.y = pathY[whatPoint] - 32;
-                } else
-                {
-                    whatPoint++;
-                }
+                whatPoint = 0;
+                interactionBox.x = pathX[whatPoint] - 32;
+                interactionBox.y = pathY[whatPoint] - 32;
             }
+            else
+                whatPoint++;
+
         }
     }
 
-    public void dispose()
+    public Vector2 getPosition()
     {
-        enemyImage.dispose();
+        float centerX = interactionBox.x + interactionBox.width / 2;
+        float centerY = interactionBox.y + interactionBox.height / 2;
+        return new Vector2(centerX, centerY);
     }
+
 }
