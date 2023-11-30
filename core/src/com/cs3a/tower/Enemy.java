@@ -28,8 +28,8 @@ public class Enemy {
         interactionBox.y = 1080 / 2;
         whatPoint = 0;
     }
-
-    public Enemy(int[] pathX, int[] pathY, int[] directionX, int[] directionY) {
+  
+    public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY)
         health = 1;
         setEnemyImage();
         interactionBox = new Rectangle();
@@ -45,10 +45,9 @@ public class Enemy {
 
     }
 
-    public Enemy(int[] pathX, int[] pathY, int[] directionX, int[] directionY, int health) {
+    public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY,int health){
         this.health = health;
         setEnemyImage();
-
         interactionBox = new Rectangle();
         interactionBox.width = 64;
         interactionBox.height = 64;
@@ -77,11 +76,14 @@ public class Enemy {
 
     public void setEnemyImage() {
 
-        if (this.health >= 3) {
+        if(this.health >= 3){
             enemyImage = new Texture(Gdx.files.internal("RedSquare.png"));
-        } else if (this.health == 2) {
+        }
+        else if(this.health == 2)
+        {
             enemyImage = new Texture(Gdx.files.internal("PurpleSquare.png"));
-        } else {
+        }
+        else{
             enemyImage = new Texture(Gdx.files.internal("BlueSquare.png"));
         }
 
@@ -92,7 +94,8 @@ public class Enemy {
         return health;
     }
 
-    public void setHealth(int health) {
+    public void setHealth(int health){
+
         this.health = health;
         setEnemyImage();
 

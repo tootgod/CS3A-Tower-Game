@@ -163,6 +163,14 @@ public class GameScreen implements Screen {
         }
     }
 
+    private void spawnEnemy(int health) {
+        Enemy enemy = new Enemy(pathX,pathY,directionX,directionY,health);
+        enemies.add(enemy);
+        lastEnemySpwanTime = TimeUtils.nanoTime();
+        enemySpawnNumbers--;
+    }
+
+
     @Override
     public void resize(int width, int height) {
     }
