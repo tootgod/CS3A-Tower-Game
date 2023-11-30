@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.TimeUtils;
 
 import java.awt.*;
 
@@ -35,7 +36,7 @@ public class Tower
 
         attackRange = new Circle();
         attackRange.set(0,0,range);
-        attackTimer = 10000000.0f;
+        attackTimer = 1000000000.0f;
 
     }
 
@@ -85,13 +86,15 @@ public class Tower
         this.range = range;
     }
 
-    public void attackUpdate(float delta, Enemy enemy)
+    public boolean canFire(Enemy enemy)
     {
-        timeSinceLastAttack += delta;
 
-        if(timeSinceLastAttack > attackTimer && isEnemyInRange(enemy))
-        {
-            timeSinceLastAttack = 0;
+        if(TimeUtils.nanoTime() - timeSinceLastAttack > 1000000000){
+            timeSinceLastAttack = TimeUtils.nanoTime();
+            return true;
+        }
+        else{
+            return false;
         }
     }
 

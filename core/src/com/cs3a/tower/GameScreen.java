@@ -112,9 +112,9 @@ public class GameScreen implements Screen {
 
             for (Tower tower : towers)
             {
-                tower.attackUpdate(delta, enemy);
+                //tower.attackUpdate(delta, enemy);
 
-                if(tower.isEnemyInRange(enemy))
+                if(tower.isEnemyInRange(enemy) && tower.canFire(enemy))
                 {
                     enemy.removeHealth(tower.getDamage());
 
