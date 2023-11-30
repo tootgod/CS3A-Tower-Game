@@ -3,42 +3,62 @@ package com.cs3a.tower;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Rectangle;
 
 import java.awt.*;
 
 public class Tower
 {
     private Texture towerTexture;
+
+    private Rectangle interactionBox;
+    private Circle attackRange;
     private Vector2 position;
     private int damage;
-    private double range;
+    private float range;
 
     private float attackTimer;
     private float timeSinceLastAttack;
 
-    public Tower(int damage, double range, float delta)
+    public Tower()
     {
         towerTexture = new Texture("Tower.png");
-        position = new Vector2(0, 0);
-        this.damage = damage;
-        this.range = range;
-        this.attackTimer = 4.0f;
-        this.timeSinceLastAttack = 0.0f;
+        interactionBox = new Rectangle();
+        interactionBox.width = 64;
+        interactionBox.height = 64;
+        position = new Vector2(0,0);
+        damage = 1;
+        range = 64;
+
+        attackRange = new Circle();
+        attackRange.set(0,0,range);
+        attackTimer = 10000000.0f;
 
     }
 
-    public void setPosition(float x, float y)
+    public void setPosition(float x, float y) {
+        float halfWidth = (float) towerTexture.getWidth() / 2;
+        float halfHeight = (float) towerTexture.getHeight() / 2;
+
+        position.set(x - halfWidth, y - halfHeight);
+
+        interactionBox = new Rectangle(position.x, position.y, towerTexture.getWidth(), towerTexture.getHeight());
+
+        attackRange = new Circle(position.x + halfWidth - range / 2, position.y + halfHeight - range / 2, range);
+    }
+
+    public Texture getTowerTexture()
     {
-        position.set(x - (float) towerTexture.getWidth() / 2, y - (float) towerTexture.getHeight() / 2);
+        return towerTexture;
     }
 
-    public void render(SpriteBatch batch)
-    {
-        batch.begin();
-        batch.draw(towerTexture, position.x, position.y);
-        batch.end();
+    public Rectangle getInteractionBox() {
+        return interactionBox;
     }
+
     public int getDamage()
     {
         return damage;
@@ -54,12 +74,13 @@ public class Tower
         return position;
     }
 
+
     public void setDamage(int damage)
     {
         this.damage = damage;
     }
 
-    public void setRange(double range)
+    public void setRange(float range)
     {
         this.range = range;
     }
@@ -68,20 +89,15 @@ public class Tower
     {
         timeSinceLastAttack += delta;
 
-        if(timeSinceLastAttack > attackTimer && isEnemyInRange(this, enemy))
+        if(timeSinceLastAttack > attackTimer && isEnemyInRange(enemy))
         {
             timeSinceLastAttack = 0;
         }
     }
 
-    public boolean isEnemyInRange(Tower tower, Enemy enemy)
+    public boolean isEnemyInRange(Enemy enemy)
     {
-        Vector2 towerPosition = tower.getPosition();
-        Vector2 enemyPosition = enemy.getPosition();
-
-       double distance = Math.sqrt(Math.pow(enemyPosition.x - towerPosition.x, 2) + Math.pow(enemyPosition.y - towerPosition.y, 2));
-       System.out.println("Distance is: " + distance);
-       return distance <= tower.getRange();
+        return Intersector.overlaps(attackRange, enemy.interactionBox);
     }
 
     public void dispose()

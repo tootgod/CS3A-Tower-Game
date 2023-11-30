@@ -23,6 +23,7 @@ public class GameScreen implements Screen {
 
     Texture background;
     Texture menuBackground;
+    TiledMap map;
     Vector3 touchPos;
     SpriteBatch batch;
 
@@ -39,13 +40,14 @@ public class GameScreen implements Screen {
     Random rand;
 
     int enemySpawnNumbers;
+
     OrthographicCamera camera;
     public GameScreen(final TowerDefence game) {
         this.game = game;
 
         background = new Texture(Gdx.files.internal("LevelBackground.png"));
-
         menuBackground = new Texture(Gdx.files.internal("MenuBackground.png"));
+        map = new TiledMap();
         rand = new Random();
         touchPos = new Vector3();
         batch = new SpriteBatch();
@@ -91,15 +93,16 @@ public class GameScreen implements Screen {
             game.batch.draw(enemy.enemyImage, enemy.interactionBox.x, enemy.interactionBox.y,  enemy.interactionBox.width,  enemy.interactionBox.height);
         }
 
-        for(Tower tower: towers)
+        for(Tower tower : towers)
         {
-            tower.render(batch);
+            game.batch.draw(tower.getTowerTexture(), tower.getPosition().x, tower.getPosition().y);
         }
 
         game.batch.draw(menuBackground,1664,0);
         //game.font.draw(game.batch, "Drops Collected: " + enemy.whatPoint, enemy.pathX[enemy.whatPoint + 1], enemy.pathY[enemy.whatPoint + 1]);
         game.batch.end();
 
+       // map.showMap();
 
         Iterator<Enemy> iter = enemies.iterator();
         while (iter.hasNext())
@@ -110,13 +113,15 @@ public class GameScreen implements Screen {
             for (Tower tower : towers)
             {
                 tower.attackUpdate(delta, enemy);
-                if(tower.isEnemyInRange(tower, enemy))
+
+                if(tower.isEnemyInRange(enemy))
                 {
                     enemy.removeHealth(tower.getDamage());
 
                     if(enemy.getHealth() <= 0)
                     {
                         iter.remove();
+                        break;
                     }
                 }
             }
@@ -141,13 +146,17 @@ public class GameScreen implements Screen {
     {
         public boolean touchDown(int screenX, int screenY, int pointer, int button)
         {
-            if(isPlacing)
+            int[][] area = map.getMap();
+
+            // if not using map -> if(isPlacing)
+            if(area[screenX][screenY] == 1)
             {
                 touchPos.set(screenX, screenY, 0);
                 camera.unproject(touchPos);
-                Tower tower = new Tower(1, 150,1000000000);
+                Tower tower = new Tower();
                 tower.setPosition(touchPos.x, touchPos.y);
                 towers.add(tower);
+                area[screenX][screenY] = -1;
                 return true;
             }
             return false;
