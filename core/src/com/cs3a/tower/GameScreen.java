@@ -134,14 +134,6 @@ public class GameScreen implements Screen {
 
     }
 
-    private void spawnEnemy(int health)
-    {
-        Enemy enemy = new Enemy(pathX,pathY,directionX,directionY,health);
-        enemies.add(enemy);
-        lastEnemySpawnTime = TimeUtils.nanoTime();
-        enemySpawnNumbers--;
-    }
-
     private class TowerInputProcessor extends com.badlogic.gdx.InputAdapter
     {
         public boolean touchDown(int screenX, int screenY, int pointer, int button)
@@ -166,7 +158,7 @@ public class GameScreen implements Screen {
     private void spawnEnemy(int health) {
         Enemy enemy = new Enemy(pathX,pathY,directionX,directionY,health);
         enemies.add(enemy);
-        lastEnemySpwanTime = TimeUtils.nanoTime();
+        lastEnemySpawnTime = TimeUtils.nanoTime();
         enemySpawnNumbers--;
     }
 
