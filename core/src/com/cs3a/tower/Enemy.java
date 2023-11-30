@@ -29,7 +29,7 @@ public class Enemy {
         whatPoint = 0;
     }
   
-    public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY)
+    public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY){
         health = 1;
         setEnemyImage();
         interactionBox = new Rectangle();
