@@ -141,7 +141,14 @@ public class GameScreen implements Screen {
             int[][] area = map.getMap();
 
             // if not using map -> if(isPlacing)
-            if(area[screenX][screenY] == 1)
+            int mapWidth = area.length; // Assuming area represents a 2D array for the map width
+            int mapHeight = area[0].length; // Assuming area represents a 2D array for the map height
+            int towerWidth = 32;
+            int towerHeight = 48;
+
+            // Check if the tower placement is within the map boundaries
+            if ((screenX >= towerWidth && screenX < mapWidth - towerWidth * 2) && (screenY >= towerHeight && screenY < mapHeight - towerHeight * 2) &&
+                    area[screenX][screenY] == 1 && area[screenX + towerWidth][screenY] == 1 && area[screenX - towerWidth][screenY] == 1 && area[screenX][screenY + towerHeight] == 1 && area[screenX][screenY - towerHeight] == 1)
             {
                 touchPos.set(screenX, screenY, 0);
                 camera.unproject(touchPos);
@@ -186,11 +193,10 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-//        for(Tower tower: towers)
-//        {
-//            tower.dispose();
-//        }
-
+        for(Tower tower: towers)
+        {
+            tower.dispose();
+        }
 
     }
 }
