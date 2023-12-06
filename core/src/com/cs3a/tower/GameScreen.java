@@ -101,7 +101,7 @@ public class GameScreen implements Screen {
         }
 
         for (Tower tower : towers) {
-            game.batch.draw(tower.getTowerTexture(), tower.getPosition().x, tower.getPosition().y);
+            game.batch.draw(tower.getTowerTexture(), tower.interactionBox.x, tower.interactionBox.y,tower.interactionBox.width,tower.interactionBox.height);
         }
         for(Bullet bullet : bullets)
         {
@@ -184,8 +184,8 @@ public class GameScreen implements Screen {
             {
                 touchPos.set(screenX, screenY, 0);
                 camera.unproject(touchPos);
-                Tower tower = new Tower();
-                tower.setPosition(touchPos.x, touchPos.y);
+                Tower tower = new LongTower();
+                tower.setPosition(touchPos.x-32, touchPos.y-32);
                 towers.add(tower);
 
                 // loop prevents towers from overlapping
