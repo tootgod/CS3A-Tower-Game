@@ -15,8 +15,8 @@ public class Tower
 {
     private Texture towerTexture;
 
-    private Rectangle interactionBox;
-    private Circle attackRange;
+    public Rectangle interactionBox;
+    public Circle attackRange;
     private Vector2 position;
     private int damage;
     private float range;
@@ -32,11 +32,11 @@ public class Tower
         interactionBox.height = 64;
         position = new Vector2(0,0);
         damage = 1;
-        range = 64;
+        range = 164;
 
         attackRange = new Circle();
         attackRange.set(0,0,range);
-        attackTimer = 1000000000.0f;
+        attackTimer = 100000000.0f;
 
     }
 
@@ -48,7 +48,7 @@ public class Tower
 
         interactionBox = new Rectangle(position.x, position.y, towerTexture.getWidth(), towerTexture.getHeight());
 
-        attackRange = new Circle(position.x + halfWidth - range / 2, position.y + halfHeight - range / 2, range);
+        attackRange = new Circle(position.x + 32, position.y + 32, range);
     }
 
     public Texture getTowerTexture()
@@ -89,7 +89,7 @@ public class Tower
     public boolean canFire(Enemy enemy)
     {
 
-        if(TimeUtils.nanoTime() - timeSinceLastAttack > 1000000000){
+        if(TimeUtils.nanoTime() - timeSinceLastAttack > attackTimer){
             timeSinceLastAttack = TimeUtils.nanoTime();
             return true;
         }
