@@ -4,6 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.graphics.Texture;
+
+import java.awt.*;
 
 public class MainMenuScreen implements Screen{
 
@@ -11,11 +14,56 @@ public class MainMenuScreen implements Screen{
 
     OrthographicCamera camera;
 
+    public Rectangle newGameBox;
+
+    public Rectangle continueBox;
+
+    public Rectangle exitBox;
+
+    Texture newGameImg;
+
+    Texture continueImg;
+
+    Texture exitImg;
+
+    Texture headerImg;
+
+
+
+
     public MainMenuScreen(final TowerDefence game){
         this.game = game;
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false,1920,1080);
+
+        this.newGameBox = new Rectangle();
+        this.newGameBox.width = 256;
+        this.newGameBox.height = 96;
+        this.newGameBox.x = 832;
+        this.newGameBox.y = 470;
+
+        this.continueBox = new Rectangle();
+        this.continueBox.width = 256;
+        this.continueBox.height = 96;
+        this.continueBox.x = 832;
+        this.continueBox.y = 330;
+
+        this.exitBox = new Rectangle();
+        this.exitBox.width = 256;
+        this.exitBox.height = 96;
+        this.exitBox.x = 832;
+        this.exitBox.y = 200;
+
+        newGameImg = new Texture(Gdx.files.internal("NewGame.png"));
+
+        continueImg = new Texture(Gdx.files.internal("Continue.png"));
+
+        exitImg = new Texture(Gdx.files.internal("Exit.png"));
+
+        headerImg = new Texture(Gdx.files.internal("Header.png"));
+
+
     }
 
     @Override
@@ -26,11 +74,14 @@ public class MainMenuScreen implements Screen{
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-        game.font.draw(game.batch, "Welcome to Defence Test!!! ", 100,150);
-        game.font.draw(game.batch, "Click anywhere to begin!",100,100);
+        game.batch.draw(headerImg, 704, 800);
+        game.batch.draw(newGameImg, 832, 470);
+        game.batch.draw(continueImg, 832, 330);
+        game.batch.draw(exitImg, 832, 200);
         game.batch.end();
 
-        if(Gdx.input.isTouched()){
+        if(Gdx.input.isTouched() && Gdx.input.getX() > 831 && Gdx.input.getX() < 1087
+            && Gdx.input.getY() > 500 && Gdx.input.getY() < 608){
             game.setScreen(new GameScreen(game));
             dispose();
         }
