@@ -11,18 +11,17 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import java.awt.*;
 
-public class Tower
+public class  Tower
 {
-    private Texture towerTexture;
+    protected Texture towerTexture;
 
     public Rectangle interactionBox;
     public Circle attackRange;
-    private Vector2 position;
-    private int damage;
-    private float range;
+    protected int damage;
+    protected float range;
 
-    private float attackTimer;
-    private float timeSinceLastAttack;
+    protected float attackTimer;
+    protected float timeSinceLastAttack;
 
     public Tower()
     {
@@ -30,7 +29,6 @@ public class Tower
         interactionBox = new Rectangle();
         interactionBox.width = 64;
         interactionBox.height = 64;
-        position = new Vector2(0,0);
         damage = 1;
         range = 164;
 
@@ -41,14 +39,10 @@ public class Tower
     }
 
     public void setPosition(float x, float y) {
-        float halfWidth = (float) towerTexture.getWidth() / 2;
-        float halfHeight = (float) towerTexture.getHeight() / 2;
 
-        position.set(x - halfWidth, y - halfHeight);
+        interactionBox = new Rectangle(x,y,towerTexture.getWidth(), towerTexture.getHeight());
 
-        interactionBox = new Rectangle(position.x, position.y, towerTexture.getWidth(), towerTexture.getHeight());
-
-        attackRange = new Circle(position.x + 32, position.y + 32, range);
+        attackRange = new Circle(x + 32, y + 32, range);
     }
 
     public Texture getTowerTexture()
@@ -68,11 +62,6 @@ public class Tower
     public double getRange()
     {
         return range;
-    }
-
-    public Vector2 getPosition()
-    {
-        return position;
     }
 
 
