@@ -11,6 +11,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -30,6 +31,8 @@ public class GameScreen implements Screen {
     Array<Enemy> enemies;
     long lastEnemySpawnTime;
     Array<Tower> towers;
+
+    Array<Bullet> bullets;
     boolean isPlacing;
 
     int[] pathX = new int[]{-64,1062+32,1062,658-32,658,1664+64};
@@ -56,6 +59,7 @@ public class GameScreen implements Screen {
         enemies = new Array<Enemy>();
         spawnEnemy(rand.nextInt(3) + 1);
         enemySpawnNumbers = 10;
+        bullets = new Array<Bullet>();
 
         towers = new Array<Tower> ();
         isPlacing = true;
@@ -97,18 +101,46 @@ public class GameScreen implements Screen {
         {
             game.batch.draw(tower.getTowerTexture(), tower.getPosition().x, tower.getPosition().y);
         }
+        for(Bullet bullet : bullets)
+        {
+            game.batch.draw(bullet.bulletTexture, bullet.interactionBox.x, bullet.interactionBox.y,  bullet.interactionBox.width,  bullet.interactionBox.height);
+        }
 
         game.batch.draw(menuBackground,1664,0);
         //game.font.draw(game.batch, "Drops Collected: " + enemy.whatPoint, enemy.pathX[enemy.whatPoint + 1], enemy.pathY[enemy.whatPoint + 1]);
         game.batch.end();
 
        // map.showMap();
+        Iterator<Bullet> bulletIterator;
 
-        Iterator<Enemy> iter = enemies.iterator();
-        while (iter.hasNext())
+        Iterator<Enemy> enemyIterator = enemies.iterator();
+        while (enemyIterator.hasNext())
         {
-            Enemy enemy = iter.next();
+            bulletIterator = bullets.iterator();
+            Enemy enemy = enemyIterator.next();
             enemy.enemyAi();
+
+            while (bulletIterator.hasNext())
+            {
+                Bullet bullet = bulletIterator.next();
+                bullet.bulletAi();
+                if(!Intersector.overlaps(bullet.homeTower.attackRange,bullet.interactionBox))
+                {
+                    bullet.stop();
+                    bulletIterator.remove();
+                    //bulletIterator.next();
+                }
+                if(bullet.checkHit(enemy))
+                {
+                    enemy.removeHealth(bullet.damage);
+                    bulletIterator.remove();
+                }
+                if(enemy.getHealth() <= 0)
+                {
+                    enemyIterator.remove();
+                    break;
+                }
+            }
 
             for (Tower tower : towers)
             {
@@ -116,17 +148,13 @@ public class GameScreen implements Screen {
 
                 if(tower.isEnemyInRange(enemy) && tower.canFire(enemy))
                 {
-                    enemy.removeHealth(tower.getDamage());
+                    //enemy.removeHealth(tower.getDamage());
+                    spawnBullet(enemy,tower);
 
-                    if(enemy.getHealth() <= 0)
-                    {
-                        iter.remove();
-                        break;
-                    }
                 }
             }
 
-            if(TimeUtils.nanoTime() - lastEnemySpawnTime > 1000000000 && enemySpawnNumbers > 0){
+            if(TimeUtils.nanoTime() - lastEnemySpawnTime > 100000000 && enemySpawnNumbers > 0){
                 spawnEnemy(rand.nextInt(3) + 1);
             }
 
@@ -160,6 +188,12 @@ public class GameScreen implements Screen {
         enemies.add(enemy);
         lastEnemySpawnTime = TimeUtils.nanoTime();
         enemySpawnNumbers--;
+    }
+
+    private void spawnBullet(Enemy enemy, Tower tower)
+    {
+        Bullet bullet = new Bullet(tower.interactionBox.x + 10, tower.interactionBox.y + 10,0.01f, tower.getDamage(), enemy.interactionBox.x + 32,enemy.interactionBox.y + 32, tower);
+        bullets.add(bullet);
     }
 
 
