@@ -18,12 +18,15 @@ public class Bullet {
 
     public float xAmt;
     public float yAmt;
+    public boolean canDamage;
 
 
     public Bullet(float x, float y, float speed, int damage,float goalX, float goalY,Tower tower){
         bulletTexture = new Texture(Gdx.files.internal("Bullet.png"));
         interactionBox = new Rectangle(x,y,4,4);
         this.damage = damage;
+
+        canDamage = true;
 
         xAmt = (goalX - interactionBox.x);
         yAmt = (goalY - interactionBox.y);
@@ -33,8 +36,9 @@ public class Bullet {
         xAmt = xAmt /(float) dist;
         yAmt = yAmt /(float) dist;
 
-        xAmt = (goalX - interactionBox.x) * speed;
-        yAmt = (goalY - interactionBox.y) * speed;
+        xAmt *= speed;
+        yAmt *= speed;
+        System.out.println(xAmt + " ," + yAmt);
 
         homeTower = tower;
     }
@@ -50,5 +54,10 @@ public class Bullet {
     public void stop(){
         xAmt = 0;
         yAmt = 0;
+    }
+    public void hide()
+    {
+        canDamage = false;
+        bulletTexture.dispose();
     }
 }
