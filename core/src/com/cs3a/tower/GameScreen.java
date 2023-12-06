@@ -132,7 +132,7 @@ public class GameScreen implements Screen {
                     bulletIterator.remove();
                     //bulletIterator.next();
                 }
-                if (bullet.checkHit(enemy)) {
+                if (bullet.checkHit(enemy) && bullet.canDamage) {
                     enemy.removeHealth(bullet.damage);
                     bullet.hide();
                 }

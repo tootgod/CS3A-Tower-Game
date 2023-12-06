@@ -58,6 +58,6 @@ public class Bullet {
     public void hide()
     {
         canDamage = false;
-        bulletTexture.dispose();
+        bulletTexture = new Texture(Gdx.files.internal("Transparent.png"));
     }
 }
