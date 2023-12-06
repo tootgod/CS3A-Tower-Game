@@ -36,7 +36,7 @@ public class Tower
 
         attackRange = new Circle();
         attackRange.set(0,0,range);
-        attackTimer = 100000000.0f;
+        attackTimer = 1000000000.0f;
 
     }
 
