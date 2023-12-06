@@ -11,6 +11,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -31,6 +32,8 @@ public class GameScreen implements Screen {
     Array<Enemy> enemies;
     long lastEnemySpawnTime;
     Array<Tower> towers;
+
+    Array<Bullet> bullets;
     boolean isPlacing;
 
     int[] pathX = new int[]{-64, 1062 + 32, 1062, 658 - 32, 658, 1664 + 64};
@@ -59,7 +62,8 @@ public class GameScreen implements Screen {
         //Setup Default Enemy
         enemies = new Array<Enemy>();
         spawnEnemy(rand.nextInt(3) + 1);
-        enemySpawnNumbers = 10;
+        enemySpawnNumbers = 100;
+        bullets = new Array<Bullet>();
 
         towers = new Array<Tower>();
         isPlacing = true;
@@ -99,32 +103,62 @@ public class GameScreen implements Screen {
         for (Tower tower : towers) {
             game.batch.draw(tower.getTowerTexture(), tower.getPosition().x, tower.getPosition().y);
         }
+        for(Bullet bullet : bullets)
+        {
+            game.batch.draw(bullet.bulletTexture, bullet.interactionBox.x, bullet.interactionBox.y,  bullet.interactionBox.width,  bullet.interactionBox.height);
+        }
 
         game.batch.draw(menuBackground, 1664, 0);
         //game.font.draw(game.batch, "Drops Collected: " + enemy.whatPoint, enemy.pathX[enemy.whatPoint + 1], enemy.pathY[enemy.whatPoint + 1]);
         game.batch.end();
 
-        // map.showMap();
+       // map.showMap();
+        Iterator<Bullet> bulletIterator;
+        bulletIterator = bullets.iterator();
 
-        Iterator<Enemy> iter = enemies.iterator();
-        while (iter.hasNext()) {
-            Enemy enemy = iter.next();
+        while (bulletIterator.hasNext()) {
+            Bullet bullet = bulletIterator.next();
+            bullet.bulletAi();
+        }
+
+        Iterator<Enemy> enemyIterator = enemies.iterator();
+        while (enemyIterator.hasNext()) {
+            bulletIterator = bullets.iterator();
+            Enemy enemy = enemyIterator.next();
             enemy.enemyAi();
 
-            for (Tower tower : towers) {
-                //tower.attackUpdate(delta, enemy);
-
-                if (tower.isEnemyInRange(enemy) && tower.canFire(enemy)) {
-                    enemy.removeHealth(tower.getDamage());
-
-                    if (enemy.getHealth() <= 0) {
-                        iter.remove();
-                        break;
-                    }
+            while (bulletIterator.hasNext()) {
+                Bullet bullet = bulletIterator.next();
+                if (!Intersector.overlaps(bullet.homeTower.attackRange, bullet.interactionBox)) {
+                    bullet.stop();
+                    bulletIterator.remove();
+                    //bulletIterator.next();
+                }
+                if (bullet.checkHit(enemy) && bullet.canDamage) {
+                    enemy.removeHealth(bullet.damage);
+                    bullet.hide();
+                }
+                if (enemy.getHealth() <= 0) {
+                    enemyIterator.remove();
+                    break;
                 }
             }
 
-            if (TimeUtils.nanoTime() - lastEnemySpawnTime > 1000000000 && enemySpawnNumbers > 0) {
+
+
+            for (Tower tower : towers)
+            {
+                //tower.attackUpdate(delta, enemy);
+
+                if(tower.isEnemyInRange(enemy) && tower.canFire(enemy))
+                {
+                    //enemy.removeHealth(tower.getDamage());
+                    spawnBullet(enemy,tower);
+
+                }
+            }
+
+            if(TimeUtils.nanoTime() - lastEnemySpawnTime > 100000000 && enemySpawnNumbers > 0){
                 spawnEnemy(rand.nextInt(3) + 1);
             }
 
@@ -176,6 +210,12 @@ public class GameScreen implements Screen {
         enemies.add(enemy);
         lastEnemySpawnTime = TimeUtils.nanoTime();
         enemySpawnNumbers--;
+    }
+
+    private void spawnBullet(Enemy enemy, Tower tower)
+    {
+        Bullet bullet = new Bullet(tower.interactionBox.x + 10, tower.interactionBox.y + 10,10f, tower.getDamage(), enemy.interactionBox.x + 32,enemy.interactionBox.y + 32, tower);
+        bullets.add(bullet);
     }
 
 
