@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import org.w3c.dom.Text;
 
 public class GameScreen implements Screen {
     final TowerDefence game;
@@ -35,16 +36,19 @@ public class GameScreen implements Screen {
     Array<Bullet> bullets;
     boolean isPlacing;
 
-    int[] pathX = new int[]{-64,1062+32,1062,658-32,658,1664+64};
-    int[] pathY = new int[]{647,647,937+32,937,129-32,129};
-    int[] directionX = new int[]{300,0,-300,0,300};
-    int[] directionY = new int[]{0,300,0,-300,0};
+    int[] pathX = new int[]{-64, 1062 + 32, 1062, 658 - 32, 658, 1664 + 64};
+    int[] pathY = new int[]{647, 647, 937 + 32, 937, 129 - 32, 129};
+    int[] directionX = new int[]{300, 0, -300, 0, 300};
+    int[] directionY = new int[]{0, 300, 0, -300, 0};
 
     Random rand;
+
+    boolean shown = false;
 
     int enemySpawnNumbers;
 
     OrthographicCamera camera;
+
     public GameScreen(final TowerDefence game) {
         this.game = game;
 
@@ -61,14 +65,14 @@ public class GameScreen implements Screen {
         enemySpawnNumbers = 100;
         bullets = new Array<Bullet>();
 
-        towers = new Array<Tower> ();
+        towers = new Array<Tower>();
         isPlacing = true;
 
         Gdx.input.setInputProcessor(new TowerInputProcessor());
 
         // create the camera and the SpriteBatch
         camera = new OrthographicCamera();
-        camera.setToOrtho(false,1920,1080);
+        camera.setToOrtho(false, 1920, 1080);
 
     }
 
@@ -91,14 +95,12 @@ public class GameScreen implements Screen {
         // begin a new batch and draw the bucket and
         // all drops
         game.batch.begin();
-        game.batch.draw(background,0,0, 1920,1080);
-        for(Enemy enemy : enemies)
-        {
-            game.batch.draw(enemy.enemyImage, enemy.interactionBox.x, enemy.interactionBox.y,  enemy.interactionBox.width,  enemy.interactionBox.height);
+        game.batch.draw(background, 0, 0, 1920, 1080);
+        for (Enemy enemy : enemies) {
+            game.batch.draw(enemy.enemyImage, enemy.interactionBox.x, enemy.interactionBox.y, enemy.interactionBox.width, enemy.interactionBox.height);
         }
 
-        for(Tower tower : towers)
-        {
+        for (Tower tower : towers) {
             game.batch.draw(tower.getTowerTexture(), tower.getPosition().x, tower.getPosition().y);
         }
         for(Bullet bullet : bullets)
@@ -106,7 +108,7 @@ public class GameScreen implements Screen {
             game.batch.draw(bullet.bulletTexture, bullet.interactionBox.x, bullet.interactionBox.y,  bullet.interactionBox.width,  bullet.interactionBox.height);
         }
 
-        game.batch.draw(menuBackground,1664,0);
+        game.batch.draw(menuBackground, 1664, 0);
         //game.font.draw(game.batch, "Drops Collected: " + enemy.whatPoint, enemy.pathX[enemy.whatPoint + 1], enemy.pathY[enemy.whatPoint + 1]);
         game.batch.end();
 
@@ -169,14 +171,14 @@ public class GameScreen implements Screen {
         public boolean touchDown(int screenX, int screenY, int pointer, int button)
         {
             int[][] area = map.getMap();
+            int mapWidth = area.length;
+            int mapHeight = area[0].length;
 
-            // if not using map -> if(isPlacing)
-            int mapWidth = area.length; // Assuming area represents a 2D array for the map width
-            int mapHeight = area[0].length; // Assuming area represents a 2D array for the map height
+            // these should be set to half of the tower image
             int towerWidth = 32;
             int towerHeight = 48;
 
-            // Check if the tower placement is within the map boundaries
+            // Check if the tower placement is within the map boundaries and does not overlap with path
             if ((screenX >= towerWidth && screenX < mapWidth - towerWidth * 2) && (screenY >= towerHeight && screenY < mapHeight - towerHeight * 2) &&
                     area[screenX][screenY] == 1 && area[screenX + towerWidth][screenY] == 1 && area[screenX - towerWidth][screenY] == 1 && area[screenX][screenY + towerHeight] == 1 && area[screenX][screenY - towerHeight] == 1)
             {
@@ -185,12 +187,23 @@ public class GameScreen implements Screen {
                 Tower tower = new Tower();
                 tower.setPosition(touchPos.x, touchPos.y);
                 towers.add(tower);
-                area[screenX][screenY] = -1;
+
+                // loop prevents towers from overlapping
+                for(int i = screenX - towerWidth; i < screenX + towerWidth; i++)
+                {
+                    for(int j = screenY - towerHeight; j < screenY + towerHeight; j++)
+                    {
+                        area[i][j] = -1;
+                    }
+                }
+
                 return true;
             }
             return false;
         }
     }
+
+
 
     private void spawnEnemy(int health) {
         Enemy enemy = new Enemy(pathX,pathY,directionX,directionY,health);
