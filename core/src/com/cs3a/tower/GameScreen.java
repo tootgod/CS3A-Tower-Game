@@ -220,8 +220,8 @@ public class GameScreen implements Screen {
             int mapHeight = area[0].length;
 
             // these should be set to half of the tower image
-            int towerWidth = 32;
-            int towerHeight = 48;
+            int towerWidth = 30;
+            int towerHeight = 30;
 
             // Check if the tower placement is within the map boundaries and does not overlap with path
             if ((screenX >= towerWidth && screenX < mapWidth - towerWidth * 2) && (screenY >= towerHeight && screenY < mapHeight - towerHeight * 2) &&

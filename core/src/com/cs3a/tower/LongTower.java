@@ -12,7 +12,7 @@ public class LongTower extends Tower {
         interactionBox.height = 64;
         damage = 1;
         range = 464;
-        bulletSpeed = 40f;
+        bulletSpeed = 80f;
         price = 12;
 
         attackRange = new Circle();
