@@ -35,6 +35,8 @@ public class GameScreen implements Screen {
 
     Array<Bullet> bullets;
     boolean isPlacing;
+    long timeBetweenEnemySpawns;
+    int wave;
 
     int[] pathX = new int[]{-64, 1062 + 32, 1062, 658 - 32, 658, 1664 + 64};
     int[] pathY = new int[]{647, 647, 937 + 32, 937, 129 - 32, 129};
@@ -45,7 +47,7 @@ public class GameScreen implements Screen {
 
     boolean shown = false;
 
-    int enemySpawnNumbers;
+    int enemyHealthSpawnNumbers;
 
     OrthographicCamera camera;
 
@@ -61,9 +63,10 @@ public class GameScreen implements Screen {
 
         //Setup Default Enemy
         enemies = new Array<Enemy>();
-        spawnEnemy(rand.nextInt(3) + 1);
-        enemySpawnNumbers = 100;
         bullets = new Array<Bullet>();
+
+        timeBetweenEnemySpawns = 1000000000;
+        wave = 1;
 
         towers = new Array<Tower>();
         isPlacing = true;
@@ -92,8 +95,6 @@ public class GameScreen implements Screen {
         // coordinate system specified by the camera.
         game.batch.setProjectionMatrix(camera.combined);
 
-        // begin a new batch and draw the bucket and
-        // all drops
         game.batch.begin();
         game.batch.draw(background, 0, 0, 1920, 1080);
         for (Enemy enemy : enemies) {
@@ -109,7 +110,8 @@ public class GameScreen implements Screen {
         }
 
         game.batch.draw(menuBackground, 1664, 0);
-        //game.font.draw(game.batch, "Drops Collected: " + enemy.whatPoint, enemy.pathX[enemy.whatPoint + 1], enemy.pathY[enemy.whatPoint + 1]);
+        game.font.draw(game.batch, "Wave: " + wave, 100 ,100 );
+        game.font.draw(game.batch, "Enemys to Spawn: " + enemyHealthSpawnNumbers, 100 ,115 );
         game.batch.end();
 
        // map.showMap();
@@ -132,7 +134,6 @@ public class GameScreen implements Screen {
                 if (!Intersector.overlaps(bullet.homeTower.attackRange, bullet.interactionBox)) {
                     bullet.stop();
                     bulletIterator.remove();
-                    //bulletIterator.next();
                 }
                 if (bullet.checkHit(enemy) && bullet.canDamage) {
                     enemy.removeHealth(bullet.damage);
@@ -158,10 +159,21 @@ public class GameScreen implements Screen {
                 }
             }
 
-            if(TimeUtils.nanoTime() - lastEnemySpawnTime > 100000000 && enemySpawnNumbers > 0){
-                spawnEnemy(rand.nextInt(3) + 1);
+        }
+        if(TimeUtils.nanoTime() - lastEnemySpawnTime > timeBetweenEnemySpawns && enemyHealthSpawnNumbers > 0){
+            int i = rand.nextInt(3) + 1;
+            if(enemyHealthSpawnNumbers >= i) {
+                spawnEnemy(i);
             }
+            else
+            {
+                spawnEnemy(enemyHealthSpawnNumbers);
+            }
+        }
 
+        boolean isPressed = Gdx.input.isKeyJustPressed(Keys.Z);
+        if (isPressed && enemies.isEmpty()){
+            processWaveStart();
         }
 
     }
@@ -184,7 +196,7 @@ public class GameScreen implements Screen {
             {
                 touchPos.set(screenX, screenY, 0);
                 camera.unproject(touchPos);
-                Tower tower = new LongTower();
+                Tower tower = new BasicTower();
                 tower.setPosition(touchPos.x-32, touchPos.y-32);
                 towers.add(tower);
 
@@ -209,13 +221,20 @@ public class GameScreen implements Screen {
         Enemy enemy = new Enemy(pathX,pathY,directionX,directionY,health);
         enemies.add(enemy);
         lastEnemySpawnTime = TimeUtils.nanoTime();
-        enemySpawnNumbers--;
+        enemyHealthSpawnNumbers-= health;
     }
 
     private void spawnBullet(Enemy enemy, Tower tower)
     {
-        Bullet bullet = new Bullet(tower.interactionBox.x + 10, tower.interactionBox.y + 10,10f, tower.getDamage(), enemy.interactionBox.x + 32,enemy.interactionBox.y + 32, tower);
+        Bullet bullet = new Bullet(tower.interactionBox.x + 10, tower.interactionBox.y + 10, tower.bulletSpeed, tower.getDamage(), enemy.interactionBox.x + 32,enemy.interactionBox.y + 32, tower);
         bullets.add(bullet);
+
+    }
+
+    private void processWaveStart(){
+        enemyHealthSpawnNumbers += (wave + 3) * ((wave + 3) % 1000);
+        timeBetweenEnemySpawns = 1000000000 / (long) wave;
+        wave++;
     }
 
 
