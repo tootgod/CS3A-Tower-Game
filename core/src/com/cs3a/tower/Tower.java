@@ -19,6 +19,7 @@ public class  Tower
     public Circle attackRange;
     protected int damage;
     protected float range;
+    protected float bulletSpeed;
 
     protected float attackTimer;
     protected float timeSinceLastAttack;

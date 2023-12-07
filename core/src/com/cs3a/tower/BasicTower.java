@@ -13,6 +13,7 @@ public class BasicTower extends Tower {
         interactionBox.height = 64;
         damage = 1;
         range = 164;
+        bulletSpeed = 20f;
 
         attackRange = new Circle();
         attackRange.set(0,0,range);
