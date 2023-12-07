@@ -14,6 +14,7 @@ public class BasicTower extends Tower {
         damage = 1;
         range = 164;
         bulletSpeed = 20f;
+        price = 10;
 
         attackRange = new Circle();
         attackRange.set(0,0,range);

@@ -13,10 +13,11 @@ public class LongTower extends Tower {
         damage = 1;
         range = 464;
         bulletSpeed = 40f;
+        price = 12;
 
         attackRange = new Circle();
         attackRange.set(0,0,range);
-        attackTimer = 3000000000.0f;
+        attackTimer = 25000000000.0f;
 
     }
 }

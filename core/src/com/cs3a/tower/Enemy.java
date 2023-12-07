@@ -16,11 +16,13 @@ public class Enemy {
     public int[] directionY;
     public int whatPoint;
     int[][] map;
+    private int moneyToDrop;
 
 
     public Enemy() {
         enemyImage = new Texture(Gdx.files.internal("BlueSquare.png"));
         health = 1;
+        moneyToDrop = health;
         interactionBox = new Rectangle();
         interactionBox.width = 64;
         interactionBox.height = 64;
@@ -31,6 +33,7 @@ public class Enemy {
   
     public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY){
         health = 1;
+        moneyToDrop = health;
         setEnemyImage();
         interactionBox = new Rectangle();
         interactionBox.width = 64;
@@ -47,6 +50,7 @@ public class Enemy {
 
     public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY,int health){
         this.health = health;
+        moneyToDrop = health;
         setEnemyImage();
         interactionBox = new Rectangle();
         interactionBox.width = 64;
@@ -115,6 +119,8 @@ public class Enemy {
             }
         }
     }
+
+    public int getMoneyToDrop(){return moneyToDrop;}
 
 
     public Vector2 getPosition() {
