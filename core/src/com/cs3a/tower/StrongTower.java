@@ -14,10 +14,11 @@ public class StrongTower extends Tower{
         damage = 2;
         range = 164;
         bulletSpeed = 20f;
+        price = 14;
 
         attackRange = new Circle();
         attackRange.set(0,0,range);
-        attackTimer = 2000000000.0f;
+        attackTimer = 1500000000.0f;
 
     }
 }

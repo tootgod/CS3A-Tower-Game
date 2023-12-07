@@ -25,6 +25,7 @@ public class GameScreen implements Screen {
 
     Texture background;
     Texture menuBackground;
+    Texture tempTowerDisplay;
     TiledMap map;
     Vector3 touchPos;
     SpriteBatch batch;
@@ -37,6 +38,8 @@ public class GameScreen implements Screen {
     boolean isPlacing;
     long timeBetweenEnemySpawns;
     int wave;
+    int money;
+    int towerSelector = 1;
 
     int[] pathX = new int[]{-64, 1062 + 32, 1062, 658 - 32, 658, 1664 + 64};
     int[] pathY = new int[]{647, 647, 937 + 32, 937, 129 - 32, 129};
@@ -56,6 +59,7 @@ public class GameScreen implements Screen {
 
         background = new Texture(Gdx.files.internal("LevelBackground.png"));
         menuBackground = new Texture(Gdx.files.internal("MenuBackground.png"));
+        tempTowerDisplay = new Texture(Gdx.files.internal("BasicTower.png"));
         map = new TiledMap();
         rand = new Random();
         touchPos = new Vector3();
@@ -67,6 +71,7 @@ public class GameScreen implements Screen {
 
         timeBetweenEnemySpawns = 1000000000;
         wave = 1;
+        money = 50;
 
         towers = new Array<Tower>();
         isPlacing = true;
@@ -99,6 +104,8 @@ public class GameScreen implements Screen {
         game.batch.draw(background, 0, 0, 1920, 1080);
         for (Enemy enemy : enemies) {
             game.batch.draw(enemy.enemyImage, enemy.interactionBox.x, enemy.interactionBox.y, enemy.interactionBox.width, enemy.interactionBox.height);
+            //game.font.draw(game.batch, "MoneyInside: " + enemy.getMoneyToDrop(), enemy.interactionBox.x ,enemy.interactionBox.y );
+
         }
 
         for (Tower tower : towers) {
@@ -110,8 +117,10 @@ public class GameScreen implements Screen {
         }
 
         game.batch.draw(menuBackground, 1664, 0);
+        game.batch.draw(tempTowerDisplay, 1764, 500);
         game.font.draw(game.batch, "Wave: " + wave, 100 ,100 );
         game.font.draw(game.batch, "Enemys to Spawn: " + enemyHealthSpawnNumbers, 100 ,115 );
+        game.font.draw(game.batch, "Money: " + money, 100 ,130 );
         game.batch.end();
 
        // map.showMap();
@@ -139,12 +148,13 @@ public class GameScreen implements Screen {
                     enemy.removeHealth(bullet.damage);
                     bullet.hide();
                 }
-                if (enemy.getHealth() <= 0) {
-                    enemyIterator.remove();
-                    break;
-                }
-            }
 
+            }
+            if (enemy.getHealth() <= 0) {
+                money += enemy.getMoneyToDrop();
+                enemyIterator.remove();
+                break;
+            }
 
 
             for (Tower tower : towers)
@@ -171,9 +181,32 @@ public class GameScreen implements Screen {
             }
         }
 
-        boolean isPressed = Gdx.input.isKeyJustPressed(Keys.Z);
+        boolean isPressed = Gdx.input.isKeyJustPressed(Keys.SPACE);
         if (isPressed && enemies.isEmpty()){
             processWaveStart();
+        }
+
+
+        //select BasicTower
+        isPressed = Gdx.input.isKeyJustPressed(Keys.NUM_1);
+        if(isPressed)
+        {
+            tempTowerDisplay = new Texture(Gdx.files.internal("BasicTower.png"));
+            towerSelector = 1;
+        }
+        //select StrongTower
+        isPressed = Gdx.input.isKeyJustPressed(Keys.NUM_2);
+        if(isPressed)
+        {
+            tempTowerDisplay = new Texture(Gdx.files.internal("StrongTower.png"));
+            towerSelector = 2;
+        }
+        //select LongTower
+        isPressed = Gdx.input.isKeyJustPressed(Keys.NUM_3);
+        if(isPressed)
+        {
+            tempTowerDisplay = new Texture(Gdx.files.internal("LongTower.png"));
+            towerSelector = 3;
         }
 
     }
@@ -196,9 +229,22 @@ public class GameScreen implements Screen {
             {
                 touchPos.set(screenX, screenY, 0);
                 camera.unproject(touchPos);
-                Tower tower = new BasicTower();
-                tower.setPosition(touchPos.x-32, touchPos.y-32);
-                towers.add(tower);
+                Tower tower;
+                switch (towerSelector){
+                    case 1: tower = new BasicTower();
+                            break;
+                    case 2: tower = new StrongTower();
+                            break;
+                    case 3: tower = new LongTower();
+                            break;
+                    default: tower = new BasicTower();
+                            break;
+                }
+                if(money >= tower.price) {
+                    money -= tower.price;
+                    tower.setPosition(touchPos.x - 32, touchPos.y - 32);
+                    towers.add(tower);
+                }
 
                 // loop prevents towers from overlapping
                 for(int i = screenX - towerWidth; i < screenX + towerWidth; i++)

@@ -22,6 +22,7 @@ public class  Tower
     protected float bulletSpeed;
 
     protected float attackTimer;
+    protected int price;
     protected float timeSinceLastAttack;
 
     public Tower()
@@ -32,6 +33,7 @@ public class  Tower
         interactionBox.height = 64;
         damage = 1;
         range = 164;
+        price = 10;
 
         attackRange = new Circle();
         attackRange.set(0,0,range);
