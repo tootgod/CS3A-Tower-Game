@@ -83,7 +83,10 @@ public class Enemy {
 
     public void setEnemyImage() {
 
-        if(this.health >= 3){
+        if(this.health >= 4){
+            enemyImage = new Texture(Gdx.files.internal("GreenSquare.png"));
+        }
+        else if(this.health == 3){
             enemyImage = new Texture(Gdx.files.internal("RedSquare.png"));
         }
         else if(this.health == 2)

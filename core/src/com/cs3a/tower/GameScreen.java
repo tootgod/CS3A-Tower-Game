@@ -181,7 +181,12 @@ public class GameScreen implements Screen {
 
         }
         if(TimeUtils.nanoTime() - lastEnemySpawnTime > timeBetweenEnemySpawns && enemyHealthSpawnNumbers > 0){
-            int i = rand.nextInt(3) + 1;
+            int enemyHealthModifier = 3;
+            if (wave > 10)
+            {
+                enemyHealthModifier = 4;
+            }
+            int i = rand.nextInt(enemyHealthModifier) + 1;
             if(enemyHealthSpawnNumbers >= i) {
                 spawnEnemy(i);
             }
