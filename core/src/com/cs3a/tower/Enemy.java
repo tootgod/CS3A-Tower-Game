@@ -115,9 +115,6 @@ public class Enemy {
         if (interactionBox.contains(pathX[whatPoint + 1], pathY[whatPoint + 1])) {
             if (whatPoint + 1 == directionY.length) {
                 reachedEndOfPath = true;
-                whatPoint = 0;
-                interactionBox.x = pathX[whatPoint] - 32;
-                interactionBox.y = pathY[whatPoint] - 32;
             } else {
                 whatPoint++;
             }

@@ -162,6 +162,7 @@ public class GameScreen implements Screen {
             if(enemy.hasReachedEndOfPath())
             {
                 playerHealth -= enemy.getHealth();
+                enemyIterator.remove();
             }
 
 
