@@ -74,16 +74,21 @@ public class MainMenuScreen implements Screen{
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-        game.batch.draw(headerImg, 704, 800);
+        game.batch.draw(headerImg, 630, 800);
         game.batch.draw(newGameImg, 832, 470);
         game.batch.draw(continueImg, 832, 330);
         game.batch.draw(exitImg, 832, 200);
         game.batch.end();
 
         if(Gdx.input.isTouched() && Gdx.input.getX() > 831 && Gdx.input.getX() < 1087
-            && Gdx.input.getY() > 500 && Gdx.input.getY() < 608){
+            && Gdx.input.getY() > 500 && Gdx.input.getY() < 630){
             game.setScreen(new GameScreen(game));
             dispose();
+
+        }
+        if(Gdx.input.isTouched() && Gdx.input.getX() > 831 && Gdx.input.getX() < 1087
+                && Gdx.input.getY() > 770 && Gdx.input.getY() < 870){
+            Gdx.app.exit();
         }
     }
 
