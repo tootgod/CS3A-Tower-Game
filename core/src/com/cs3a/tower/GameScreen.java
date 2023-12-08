@@ -6,6 +6,7 @@ import java.util.Random;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -120,8 +121,9 @@ public class GameScreen implements Screen {
 
         game.batch.draw(menuBackground, 1664, 0);
         game.batch.draw(tempTowerDisplay, 1764, 500);
+        game.font.setColor(Color.BLACK);
         game.font.draw(game.batch, "Wave: " + (wave - 1), 100 ,100 );
-        game.font.draw(game.batch, "Enemys to Spawn: " + enemyHealthSpawnNumbers, 100 ,115 );
+        game.font.draw(game.batch, "Enemies to Spawn: " + enemyHealthSpawnNumbers, 100 ,115 );
         game.font.draw(game.batch, "Money: " + money, 100 ,130 );
         game.font.draw(game.batch, "Health: " + playerHealth, 100, 145);
         game.batch.end();
@@ -162,6 +164,15 @@ public class GameScreen implements Screen {
             if(enemy.hasReachedEndOfPath())
             {
                 playerHealth -= enemy.getHealth();
+<<<<<<< Updated upstream
+=======
+                enemyIterator.remove();
+
+                if(playerHealth <= 0)
+                {
+                    game.setScreen((new GameOverScreen(game)));
+                }
+>>>>>>> Stashed changes
             }
 
 
