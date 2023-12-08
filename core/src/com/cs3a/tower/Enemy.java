@@ -18,6 +18,8 @@ public class Enemy {
     int[][] map;
     private int moneyToDrop;
 
+    boolean reachedEndOfPath;
+
 
     public Enemy() {
         enemyImage = new Texture(Gdx.files.internal("BlueSquare.png"));
@@ -62,6 +64,7 @@ public class Enemy {
         this.directionX = directionX;
         this.directionY = directionY;
         whatPoint = 0;
+        reachedEndOfPath = false;
 
     }
 
@@ -111,16 +114,25 @@ public class Enemy {
 
         if (interactionBox.contains(pathX[whatPoint + 1], pathY[whatPoint + 1])) {
             if (whatPoint + 1 == directionY.length) {
+                reachedEndOfPath = true;
                 whatPoint = 0;
                 interactionBox.x = pathX[whatPoint] - 32;
                 interactionBox.y = pathY[whatPoint] - 32;
             } else {
                 whatPoint++;
             }
+        } else {
+            reachedEndOfPath = false;
         }
     }
 
+    public boolean hasReachedEndOfPath()
+    {
+        return reachedEndOfPath;
+    }
+
     public int getMoneyToDrop(){return moneyToDrop;}
+
 
 
     public Vector2 getPosition() {

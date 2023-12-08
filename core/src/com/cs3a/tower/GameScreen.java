@@ -39,6 +39,7 @@ public class GameScreen implements Screen {
     long timeBetweenEnemySpawns;
     int wave;
     int money;
+    int playerHealth;
     int towerSelector = 1;
 
     int[] pathX = new int[]{-64, 1062 + 32, 1062, 658 - 32, 658, 1664 + 64};
@@ -72,6 +73,7 @@ public class GameScreen implements Screen {
         timeBetweenEnemySpawns = 1000000000;
         wave = 1;
         money = 50;
+        playerHealth = 200;
 
         towers = new Array<Tower>();
         isPlacing = true;
@@ -118,9 +120,10 @@ public class GameScreen implements Screen {
 
         game.batch.draw(menuBackground, 1664, 0);
         game.batch.draw(tempTowerDisplay, 1764, 500);
-        game.font.draw(game.batch, "Wave: " + wave, 100 ,100 );
+        game.font.draw(game.batch, "Wave: " + (wave - 1), 100 ,100 );
         game.font.draw(game.batch, "Enemys to Spawn: " + enemyHealthSpawnNumbers, 100 ,115 );
         game.font.draw(game.batch, "Money: " + money, 100 ,130 );
+        game.font.draw(game.batch, "Health: " + playerHealth, 100, 145);
         game.batch.end();
 
        // map.showMap();
@@ -155,6 +158,12 @@ public class GameScreen implements Screen {
                 enemyIterator.remove();
                 break;
             }
+
+            if(enemy.hasReachedEndOfPath())
+            {
+                playerHealth -= enemy.getHealth();
+            }
+
 
 
             for (Tower tower : towers)
