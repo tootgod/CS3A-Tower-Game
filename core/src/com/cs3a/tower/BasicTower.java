@@ -3,7 +3,6 @@ package com.cs3a.tower;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 
 public class BasicTower extends Tower {
     public BasicTower(){
