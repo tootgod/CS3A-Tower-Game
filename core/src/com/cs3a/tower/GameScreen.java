@@ -174,7 +174,7 @@ public class GameScreen implements Screen {
         }
         game.font.draw(game.batch,"Cost: 12", menuTowerX, longTowerY - 20);
 
-        if(money >= 10)
+        if(money >= 14)
         {
             game.font.setColor(Color.GREEN);
         }
