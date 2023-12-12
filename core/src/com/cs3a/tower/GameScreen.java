@@ -6,19 +6,18 @@ import java.util.Random;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import org.w3c.dom.Text;
+import org.w3c.dom.css.Rect;
 
 public class GameScreen implements Screen {
     final TowerDefence game;
@@ -28,28 +27,42 @@ public class GameScreen implements Screen {
     Texture tempTowerDisplay;
     TiledMap map;
     Vector3 touchPos;
-    SpriteBatch batch;
-
     Array<Enemy> enemies;
     long lastEnemySpawnTime;
     Array<Tower> towers;
 
     Array<Bullet> bullets;
-    boolean isPlacing;
     long timeBetweenEnemySpawns;
     int wave;
     int money;
     int playerHealth;
     int towerSelector = 1;
 
+    Rectangle baseTower;
+    Rectangle longTower;
+    Rectangle strongTower;
+
+    Texture baseTowerImg;
+    Texture longTowerImg;
+    Texture strongTowerImg;
+    Vector2 imagePosition;
+
+    // control button placement on the menu
+    // also ties to the placement of the interaction boxes
+    // increases consistency between the two being moved
+    float menuTowerX = Gdx.graphics.getWidth() - 148;
+    float basicTowerY = Gdx.graphics.getHeight() - 300;
+    float longTowerY = Gdx.graphics.getHeight() - 450;
+    float strongTowerY = Gdx.graphics.getHeight() - 600;
+
+    boolean isSelectingTower;
+    boolean isPlaced;
     int[] pathX = new int[]{-64, 1062 + 32, 1062, 658 - 32, 658, 1664 + 64};
     int[] pathY = new int[]{647, 647, 937 + 32, 937, 129 - 32, 129};
     int[] directionX = new int[]{300, 0, -300, 0, 300};
     int[] directionY = new int[]{0, 300, 0, -300, 0};
 
     Random rand;
-
-    boolean shown = false;
 
     int enemyHealthSpawnNumbers;
 
@@ -64,7 +77,30 @@ public class GameScreen implements Screen {
         map = new TiledMap();
         rand = new Random();
         touchPos = new Vector3();
-        batch = new SpriteBatch();
+        imagePosition = new Vector2();
+        isPlaced = true;
+
+
+        baseTowerImg = new Texture(Gdx.files.internal("BasicTower.png"));
+        baseTower = new Rectangle();
+        baseTower.width = 64;
+        baseTower.height = 64;
+        baseTower.x = menuTowerX;
+        baseTower.y = basicTowerY;
+
+        longTowerImg = new Texture(Gdx.files.internal("longTower.png"));
+        longTower = new Rectangle();
+        longTower.width = 64;
+        longTower.height = 64;
+        longTower.x = menuTowerX;
+        longTower.y = longTowerY;
+
+        strongTowerImg = new Texture(Gdx.files.internal("StrongTower.png"));
+        strongTower = new Rectangle();
+        strongTower.width = 64;
+        strongTower.height = 64;
+        strongTower.x = menuTowerX;
+        strongTower.y = strongTowerY;
 
         //Setup Default Enemy
         enemies = new Array<Enemy>();
@@ -76,7 +112,6 @@ public class GameScreen implements Screen {
         playerHealth = 200;
 
         towers = new Array<Tower>();
-        isPlacing = true;
 
         Gdx.input.setInputProcessor(new TowerInputProcessor());
 
@@ -85,7 +120,6 @@ public class GameScreen implements Screen {
         camera.setToOrtho(false, 1920, 1080);
 
     }
-
 
     @Override
     public void render(float delta) {
@@ -111,22 +145,91 @@ public class GameScreen implements Screen {
         }
 
         for (Tower tower : towers) {
-            game.batch.draw(tower.getTowerTexture(), tower.interactionBox.x, tower.interactionBox.y,tower.interactionBox.width,tower.interactionBox.height);
+            game.batch.draw(tower.getTowerTexture(), tower.interactionBox.x, tower.interactionBox.y, tower.interactionBox.width, tower.interactionBox.height);
         }
-        for(Bullet bullet : bullets)
-        {
-            game.batch.draw(bullet.bulletTexture, bullet.interactionBox.x, bullet.interactionBox.y,  bullet.interactionBox.width,  bullet.interactionBox.height);
+        for (Bullet bullet : bullets) {
+            game.batch.draw(bullet.bulletTexture, bullet.interactionBox.x, bullet.interactionBox.y, bullet.interactionBox.width, bullet.interactionBox.height);
         }
 
         game.batch.draw(menuBackground, 1664, 0);
-        game.batch.draw(tempTowerDisplay, 1764, 500);
-        game.font.draw(game.batch, "Wave: " + (wave - 1), 100 ,100 );
-        game.font.draw(game.batch, "Enemys to Spawn: " + enemyHealthSpawnNumbers, 100 ,115 );
-        game.font.draw(game.batch, "Money: " + money, 100 ,130 );
-        game.font.draw(game.batch, "Health: " + playerHealth, 100, 145);
+
+
+        if(money >= 10)
+        {
+            game.font.setColor(Color.GREEN);
+        }
+        else
+        {
+            game.font.setColor(Color.RED);
+        }
+        game.font.draw(game.batch,"Cost: 10", menuTowerX, basicTowerY - 20);
+
+        if(money >= 12)
+        {
+            game.font.setColor(Color.GREEN);
+        }
+        else
+        {
+            game.font.setColor(Color.RED);
+        }
+        game.font.draw(game.batch,"Cost: 12", menuTowerX, longTowerY - 20);
+
+        if(money >= 14)
+        {
+            game.font.setColor(Color.GREEN);
+        }
+        else
+        {
+            game.font.setColor(Color.RED);
+        }
+        game.font.draw(game.batch,"Cost: 14", menuTowerX, strongTowerY - 20);
+
+        game.batch.draw(baseTowerImg, menuTowerX, basicTowerY);
+        game.batch.draw(strongTowerImg, menuTowerX, strongTowerY);
+        game.batch.draw(longTowerImg, menuTowerX, longTowerY);
+
+        if(isSelectingTower) {
+            game.batch.draw(tempTowerDisplay, imagePosition.x, imagePosition.y);
+        }
+
+        game.font.setColor(Color.WHITE);
+        game.font.draw(game.batch, "Wave: " + (wave - 1), Gdx.graphics.getWidth() - 185, Gdx.graphics.getHeight() - 100);
+        game.font.draw(game.batch, "Enemies to Spawn: " + enemyHealthSpawnNumbers, Gdx.graphics.getWidth() - 185, Gdx.graphics.getHeight() - 115);
+        game.font.draw(game.batch, "Money: " + money, Gdx.graphics.getWidth() - 185, Gdx.graphics.getHeight() - 130);
+        game.font.draw(game.batch, "Health: " + playerHealth, Gdx.graphics.getWidth() - 185, Gdx.graphics.getHeight() - 145);
         game.batch.end();
 
-       // map.showMap();
+
+        if (Gdx.input.isTouched()) {
+            int x = Gdx.input.getX();
+            int y = Gdx.graphics.getHeight() - Gdx.input.getY();
+
+            if (baseTower.contains(x, y) && money >= 10) {
+                towerSelector = 1;
+                tempTowerDisplay = new Texture(Gdx.files.internal("BasicTower.png"));
+                isSelectingTower = true;
+            } else if (strongTower.contains(x, y) && money >= 12) {
+                towerSelector = 2;
+                tempTowerDisplay = new Texture(Gdx.files.internal("StrongTower.png"));
+                isSelectingTower = true;
+            } else if (longTower.contains(x, y) && money >= 14) {
+                towerSelector = 3;
+                tempTowerDisplay = new Texture(Gdx.files.internal("LongTower.png"));
+                isSelectingTower = true;
+            } else {
+                isSelectingTower = false;
+            }
+        }
+
+        if (isSelectingTower) {
+            imagePosition.set(Gdx.input.getX() - getImageWidth() / 2, Gdx.graphics.getHeight() - Gdx.input.getY() - getImageHeight() / 2);
+        }
+
+        if(Gdx.input.isTouched() && isPlaced)
+        {
+            isSelectingTower = false;
+        }
+
         Iterator<Bullet> bulletIterator;
         bulletIterator = bullets.iterator();
 
@@ -159,22 +262,23 @@ public class GameScreen implements Screen {
                 break;
             }
 
-            if(enemy.hasReachedEndOfPath())
-            {
+            if (enemy.hasReachedEndOfPath()) {
                 playerHealth -= enemy.getHealth();
+
                 enemyIterator.remove();
+
+                if (playerHealth <= 0) {
+                    game.setScreen((new GameOverScreen(game)));
+                }
             }
 
 
-
-            for (Tower tower : towers)
-            {
+            for (Tower tower : towers) {
                 //tower.attackUpdate(delta, enemy);
 
-                if(tower.isEnemyInRange(enemy) && tower.canFire(enemy))
-                {
+                if (tower.isEnemyInRange(enemy) && tower.canFire(enemy)) {
                     //enemy.removeHealth(tower.getDamage());
-                    spawnBullet(enemy,tower);
+                    spawnBullet(enemy, tower);
 
                 }
             }
@@ -189,90 +293,115 @@ public class GameScreen implements Screen {
             int i = rand.nextInt(enemyHealthModifier) + 1;
             if(enemyHealthSpawnNumbers >= i) {
                 spawnEnemy(i);
-            }
-            else
-            {
+            } else {
                 spawnEnemy(enemyHealthSpawnNumbers);
             }
         }
+
 
         boolean isPressed = Gdx.input.isKeyJustPressed(Keys.SPACE);
         if (isPressed && enemies.isEmpty()){
             processWaveStart();
         }
 
-
-        //select BasicTower
-        isPressed = Gdx.input.isKeyJustPressed(Keys.NUM_1);
-        if(isPressed)
-        {
-            tempTowerDisplay = new Texture(Gdx.files.internal("BasicTower.png"));
-            towerSelector = 1;
-        }
-        //select StrongTower
-        isPressed = Gdx.input.isKeyJustPressed(Keys.NUM_2);
-        if(isPressed)
-        {
-            tempTowerDisplay = new Texture(Gdx.files.internal("StrongTower.png"));
-            towerSelector = 2;
-        }
-        //select LongTower
-        isPressed = Gdx.input.isKeyJustPressed(Keys.NUM_3);
-        if(isPressed)
-        {
-            tempTowerDisplay = new Texture(Gdx.files.internal("LongTower.png"));
-            towerSelector = 3;
-        }
-
     }
 
-    private class TowerInputProcessor extends com.badlogic.gdx.InputAdapter
-    {
+    private int getImageWidth() {
+        switch (towerSelector) {
+            case 1:
+                return baseTowerImg.getWidth();
+            case 2:
+                return strongTowerImg.getWidth();
+            case 3:
+                return longTowerImg.getWidth();
+            default:
+                return 0;
+        }
+    }
+
+    private int getImageHeight() {
+        switch (towerSelector) {
+            case 1:
+                return baseTowerImg.getHeight();
+            case 2:
+                return strongTowerImg.getHeight();
+            case 3:
+                return longTowerImg.getHeight();
+            default:
+                return 0;
+        }
+    }
+
+    private class TowerInputProcessor extends com.badlogic.gdx.InputAdapter {
         public boolean touchDown(int screenX, int screenY, int pointer, int button)
         {
             int[][] area = map.getMap();
             int mapWidth = area.length;
             int mapHeight = area[0].length;
 
-            // these should be set to half of the tower image
             int towerWidth = 30;
             int towerHeight = 30;
 
-            // Check if the tower placement is within the map boundaries and does not overlap with path
-            if ((screenX >= towerWidth && screenX < mapWidth - towerWidth * 2) && (screenY >= towerHeight && screenY < mapHeight - towerHeight * 2) &&
-                    area[screenX][screenY] == 1 && area[screenX + towerWidth][screenY] == 1 && area[screenX - towerWidth][screenY] == 1 && area[screenX][screenY + towerHeight] == 1 && area[screenX][screenY - towerHeight] == 1)
-            {
-                touchPos.set(screenX, screenY, 0);
-                camera.unproject(touchPos);
-                Tower tower;
-                switch (towerSelector){
-                    case 1: tower = new BasicTower();
-                            break;
-                    case 2: tower = new StrongTower();
-                            break;
-                    case 3: tower = new LongTower();
-                            break;
-                    default: tower = new BasicTower();
-                            break;
-                }
-                if(money >= tower.price) {
-                    money -= tower.price;
-                    tower.setPosition(touchPos.x - 32, touchPos.y - 32);
-                    towers.add(tower);
-                }
+            if (money >= getSelectedTowerPrice()) {
+                if (screenX >= towerWidth && screenX < mapWidth - towerWidth * 2 && screenY >= towerHeight && screenY < mapHeight - towerHeight * 2 &&
+                        area[screenX][screenY] == 1 && area[screenX + towerWidth][screenY] == 1 &&  area[screenX - towerWidth][screenY] == 1 &&  area[screenX][screenY + towerHeight] == 1 &&  area[screenX][screenY - towerHeight] == 1) {
 
-                // loop prevents towers from overlapping
-                for(int i = screenX - towerWidth; i < screenX + towerWidth; i++)
-                {
-                    for(int j = screenY - towerHeight; j < screenY + towerHeight; j++)
-                    {
-                        area[i][j] = -1;
+                    touchPos.set(screenX, screenY, 0);
+                    camera.unproject(touchPos);
+                    Tower tower = createSelectedTower();
+                    if (canPlaceTower(area, screenX, screenY, towerWidth, towerHeight)) {
+                        money -= tower.price;
+                        tower.setPosition(touchPos.x - 32, touchPos.y - 32);
+                        towers.add(tower);
+
+                        // Prevent towers from overlapping and update area
+                        updateAreaWithTower(area, screenX, screenY, towerWidth, towerHeight);
+                        isPlaced = true;
+                        return isPlaced;
                     }
                 }
-
-                return true;
             }
-            return false;
+            isPlaced = false;
+            return isPlaced;
+        }
+
+        private boolean canPlaceTower(int[][] area, int screenX, int screenY, int towerWidth, int towerHeight) {
+            // Check if the tower placement is within map boundaries and not on the pathway
+            for (int i = screenX - towerWidth; i < screenX + towerWidth; i++) {
+                for (int j = screenY - towerHeight; j < screenY + towerHeight; j++) {
+                    if (area[i][j] != 1) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        private void updateAreaWithTower(int[][] area, int screenX, int screenY, int towerWidth, int towerHeight) {
+            // Update the area to denote the tower's placement
+            for (int i = screenX - towerWidth; i < screenX + towerWidth; i++) {
+                for (int j = screenY - towerHeight; j < screenY + towerHeight; j++) {
+                    area[i][j] = -1;
+                }
+            }
+        }
+
+        private int getSelectedTowerPrice() {
+            switch (towerSelector) {
+                case 1: return new BasicTower().price;
+                case 2: return new StrongTower().price;
+                case 3: return new LongTower().price;
+                default: return new BasicTower().price;
+            }
+        }
+
+        private Tower createSelectedTower() {
+            switch (towerSelector) {
+                case 1: return new BasicTower();
+                case 2: return new StrongTower();
+                case 3: return new LongTower();
+                default: return new BasicTower();
+            }
         }
     }
 
