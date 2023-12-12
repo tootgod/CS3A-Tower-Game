@@ -59,8 +59,8 @@ public class GameScreen implements Screen {
     boolean isPlaced;
     int[] pathX = new int[]{-64, 1062 + 32, 1062, 658 - 32, 658, 1664 + 64};
     int[] pathY = new int[]{647, 647, 937 + 32, 937, 129 - 32, 129};
-    int[] directionX = new int[]{300, 0, -300, 0, 300};
-    int[] directionY = new int[]{0, 300, 0, -300, 0};
+    int[] directionX = new int[]{1, 0, -1, 0, 1};
+    int[] directionY = new int[]{0, 1, 0, -1, 0};
 
     Random rand;
 
@@ -143,9 +143,12 @@ public class GameScreen implements Screen {
             //game.font.draw(game.batch, "MoneyInside: " + enemy.getMoneyToDrop(), enemy.interactionBox.x ,enemy.interactionBox.y );
 
         }
-
+        game.font.setColor(Color.BLACK);
         for (Tower tower : towers) {
             game.batch.draw(tower.getTowerTexture(), tower.interactionBox.x, tower.interactionBox.y, tower.interactionBox.width, tower.interactionBox.height);
+            game.font.draw(game.batch,"" + tower.upgradeLevel,tower.interactionBox.x,tower.interactionBox.y);
+            if(tower.upgradeLevel < 3)
+                game.font.draw(game.batch,"Price: "  + (int)(tower.price * tower.upgradePriceMultiplier),tower.interactionBox.x,tower.interactionBox.y + 32);
         }
         for (Bullet bullet : bullets) {
             game.batch.draw(bullet.bulletTexture, bullet.interactionBox.x, bullet.interactionBox.y, bullet.interactionBox.width, bullet.interactionBox.height);
@@ -200,7 +203,7 @@ public class GameScreen implements Screen {
         game.batch.end();
 
 
-        if (Gdx.input.isTouched()) {
+        if (Gdx.input.justTouched()) {
             int x = Gdx.input.getX();
             int y = Gdx.graphics.getHeight() - Gdx.input.getY();
 
@@ -218,6 +221,12 @@ public class GameScreen implements Screen {
                 isSelectingTower = true;
             } else {
                 isSelectingTower = false;
+            }
+            for(Tower tower : towers) {
+                if (tower.interactionBox.contains(x,y) && tower.upgradeLevel != 3  &&tower.upgradeLevel > -1 && money > (tower.price * tower.upgradePriceMultiplier)) {
+                    money -= (int) (tower.price * tower.upgradePriceMultiplier);
+                    tower.upgrade();
+                }
             }
         }
 
@@ -281,8 +290,18 @@ public class GameScreen implements Screen {
                     spawnBullet(enemy, tower);
 
                 }
+                if(tower.upgradeLevel < 0)
+                {
+                    tower.upgradeLevel = 0;
+                }
             }
 
+        }
+        for (Tower tower : towers) {
+            if(tower.upgradeLevel < 0)
+            {
+                tower.upgradeLevel = 0;
+            }
         }
         if(TimeUtils.nanoTime() - lastEnemySpawnTime > timeBetweenEnemySpawns && enemyHealthSpawnNumbers > 0){
             int enemyHealthModifier = 3;
@@ -290,9 +309,18 @@ public class GameScreen implements Screen {
             {
                 enemyHealthModifier = 4;
             }
-            int i = rand.nextInt(enemyHealthModifier) + 1;
+            float i = rand.nextInt(enemyHealthModifier) + 1;
+            if (wave > 5)
+            {
+                i += wave * .1f;
+            }
+            if(i > enemyHealthModifier )
+            {
+                i = enemyHealthModifier;
+            }
+
             if(enemyHealthSpawnNumbers >= i) {
-                spawnEnemy(i);
+                spawnEnemy((int) i);
             } else {
                 spawnEnemy(enemyHealthSpawnNumbers);
             }
@@ -408,7 +436,8 @@ public class GameScreen implements Screen {
 
 
     private void spawnEnemy(int health) {
-        Enemy enemy = new Enemy(pathX,pathY,directionX,directionY,health);
+        float speed = 400 + (wave * 3);
+        Enemy enemy = new Enemy(pathX,pathY,directionX,directionY,health,speed);
         enemies.add(enemy);
         lastEnemySpawnTime = TimeUtils.nanoTime();
         enemyHealthSpawnNumbers-= health;

@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import java.awt.*;
 
-public class  Tower
+public abstract class Tower
 {
     protected Texture towerTexture;
 
@@ -24,6 +24,8 @@ public class  Tower
     protected float attackTimer;
     protected int price;
     protected float timeSinceLastAttack;
+    protected int upgradeLevel = -1;
+    protected final float upgradePriceMultiplier;
 
     public Tower()
     {
@@ -38,7 +40,11 @@ public class  Tower
         attackRange = new Circle();
         attackRange.set(0,0,range);
         attackTimer = 1000000000.0f;
+        upgradePriceMultiplier = 1;
 
+    }
+    protected Tower(float upgradePriceMultiplier){
+        this.upgradePriceMultiplier = upgradePriceMultiplier;
     }
 
     public void setPosition(float x, float y) {
@@ -99,4 +105,6 @@ public class  Tower
     {
         towerTexture.dispose();
     }
+
+    public abstract void upgrade();
 }

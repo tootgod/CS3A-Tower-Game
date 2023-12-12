@@ -19,6 +19,7 @@ public class Enemy {
     private int moneyToDrop;
 
     boolean reachedEndOfPath;
+    float speed;
 
 
     public Enemy() {
@@ -31,6 +32,7 @@ public class Enemy {
         interactionBox.x = 0;
         interactionBox.y = 1080 / 2;
         whatPoint = 0;
+        speed = 400;
     }
   
     public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY){
@@ -50,7 +52,7 @@ public class Enemy {
 
     }
 
-    public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY,int health){
+    public Enemy(int[] pathX, int[] pathY,int[] directionX, int[] directionY,int health, float speed){
         this.health = health;
         moneyToDrop = health;
         setEnemyImage();
@@ -65,6 +67,7 @@ public class Enemy {
         this.directionY = directionY;
         whatPoint = 0;
         reachedEndOfPath = false;
+        this.speed = speed;
 
     }
 
@@ -77,7 +80,7 @@ public class Enemy {
     //never know
     public void removeHealth(int damage) {
         health -= damage;
-        System.out.println("current health: " + health);
+        //System.out.println("current health: " + health);
         setEnemyImage();
     }
 
@@ -112,8 +115,8 @@ public class Enemy {
     }
 
     public void enemyAi() {
-        interactionBox.x += directionX[whatPoint] * Gdx.graphics.getDeltaTime();
-        interactionBox.y += directionY[whatPoint] * Gdx.graphics.getDeltaTime();
+        interactionBox.x += directionX[whatPoint] * Gdx.graphics.getDeltaTime() * speed;
+        interactionBox.y += directionY[whatPoint] * Gdx.graphics.getDeltaTime() * speed;
 
         if (interactionBox.contains(pathX[whatPoint + 1], pathY[whatPoint + 1])) {
             if (whatPoint + 1 == directionY.length) {

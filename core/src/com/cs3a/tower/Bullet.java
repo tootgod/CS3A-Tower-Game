@@ -23,7 +23,7 @@ public class Bullet {
 
     public Bullet(float x, float y, float speed, int damage,float goalX, float goalY,Tower tower){
         bulletTexture = new Texture(Gdx.files.internal("Bullet.png"));
-        interactionBox = new Rectangle(x,y,4,4);
+        interactionBox = new Rectangle(x,y,8,8);
         this.damage = damage;
 
         canDamage = true;
@@ -38,7 +38,7 @@ public class Bullet {
 
         xAmt *= speed;
         yAmt *= speed;
-        System.out.println(xAmt + " ," + yAmt);
+        //System.out.println(xAmt + " ," + yAmt);
 
         homeTower = tower;
     }
