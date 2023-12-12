@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Rectangle;
 public class StrongTower extends Tower{
 
     public StrongTower(){
+        super(3.5f);
         towerTexture = new Texture("StrongTower.png");
         interactionBox = new Rectangle();
         interactionBox.width = 64;
@@ -20,5 +21,31 @@ public class StrongTower extends Tower{
         attackRange.set(0,0,range);
         attackTimer = 1500000000.0f;
 
+    }
+
+    @Override
+    public void upgrade() {
+        switch (upgradeLevel) {
+            case 0:
+                price *= upgradePriceMultiplier;
+                upgradeLevel++;
+                bulletSpeed += 20f;
+                attackTimer *= .65f;
+                break;
+            case 1:
+                price *= upgradePriceMultiplier;
+                upgradeLevel++;
+                range += 50;
+                attackTimer *=.85f;
+                attackRange = new Circle(interactionBox.x + 32, interactionBox.y + 32, range);
+                break;
+            case 2:
+                price *= upgradePriceMultiplier;
+                upgradeLevel++;
+                damage++;
+                break;
+            default:
+                break;
+        }
     }
 }

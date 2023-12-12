@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class BasicTower extends Tower {
     public BasicTower(){
+        super(3.5f);
         towerTexture = new Texture("BasicTower.png");
         interactionBox = new Rectangle();
         interactionBox.width = 64;
@@ -15,9 +16,34 @@ public class BasicTower extends Tower {
         bulletSpeed = 20f;
         price = 10;
 
+
         attackRange = new Circle();
         attackRange.set(0,0,range);
         attackTimer = 1000000000.0f;
+
+    }
+
+    @Override
+    public void upgrade() {
+        switch (upgradeLevel) {
+            case 0:
+                price *= upgradePriceMultiplier;
+                upgradeLevel++;
+                attackTimer *= 0.5f;
+                break;
+            case 1:
+                price *= upgradePriceMultiplier;
+                upgradeLevel++;attackTimer *= 0.85f;
+                bulletSpeed += 10f;
+                break;
+            case 2:
+                price *= upgradePriceMultiplier;
+                upgradeLevel++;
+                damage++;
+                break;
+            default:
+                break;
+        }
 
     }
 }
