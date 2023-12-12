@@ -83,7 +83,10 @@ public class Enemy {
 
     public void setEnemyImage() {
 
-        if(this.health >= 3){
+        if(this.health >= 4){
+            enemyImage = new Texture(Gdx.files.internal("GreenSquare.png"));
+        }
+        else if(this.health == 3){
             enemyImage = new Texture(Gdx.files.internal("RedSquare.png"));
         }
         else if(this.health == 2)
@@ -115,9 +118,6 @@ public class Enemy {
         if (interactionBox.contains(pathX[whatPoint + 1], pathY[whatPoint + 1])) {
             if (whatPoint + 1 == directionY.length) {
                 reachedEndOfPath = true;
-                whatPoint = 0;
-                interactionBox.x = pathX[whatPoint] - 32;
-                interactionBox.y = pathY[whatPoint] - 32;
             } else {
                 whatPoint++;
             }
