@@ -3,6 +3,7 @@ package com.cs3a.tower;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
+import org.w3c.dom.Text;
 
 public class BasicTower extends Tower {
     public BasicTower(){
@@ -44,6 +45,10 @@ public class BasicTower extends Tower {
             default:
                 break;
         }
+    }
 
+    Texture getTowerImg()
+    {
+       return towerTexture;
     }
 }

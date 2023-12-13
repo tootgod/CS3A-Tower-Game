@@ -48,4 +48,9 @@ public class StrongTower extends Tower{
                 break;
         }
     }
+
+    Texture getTowerImg()
+    {
+        return towerTexture;
+    }
 }

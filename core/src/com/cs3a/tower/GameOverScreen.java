@@ -49,7 +49,7 @@ public class GameOverScreen implements Screen
 
         gameOverImg = new Texture(Gdx.files.internal("GameOver.png"));
         newGameImg = new Texture(Gdx.files.internal("NewGame.png"));
-   //     mainMenuImg = new Texture(Gdx.files.internal("MainMenu.png"));
+        mainMenuImg = new Texture(Gdx.files.internal("MainMenuImg.png"));
         exitImg = new Texture(Gdx.files.internal("Exit.png"));
 
     }
@@ -68,7 +68,7 @@ public class GameOverScreen implements Screen
         game.batch.begin();
         game.batch.draw(gameOverImg, 630, 650);
         game.batch.draw(newGameImg, 832, 470);
-     //   game.batch.draw(mainMenuImg, 832, 330);
+        game.batch.draw(mainMenuImg, 832, 330);
         game.batch.draw(exitImg, 832, 200);
         game.batch.end();
 
@@ -85,7 +85,7 @@ public class GameOverScreen implements Screen
 
             if(mainMenuBox.contains(x,y))
             {
-
+                game.setScreen(new MainMenuScreen(game));
             }
 
             if(exitBox.contains(x,y))
