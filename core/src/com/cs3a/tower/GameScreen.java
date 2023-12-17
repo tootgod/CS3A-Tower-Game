@@ -2,10 +2,12 @@ package com.cs3a.tower;
 
 import java.util.Iterator;
 import java.util.Random;
+import java.math.*;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -35,16 +37,21 @@ public class GameScreen implements Screen {
     long timeBetweenEnemySpawns;
     int wave;
     int money;
+    int totalMoney = 50;
     int playerHealth;
     int towerSelector = 1;
 
     Rectangle baseTower;
     Rectangle longTower;
     Rectangle strongTower;
+    Rectangle saveButton;
+    Rectangle exitButton;
 
     Texture baseTowerImg;
     Texture longTowerImg;
     Texture strongTowerImg;
+    Texture saveButtonImg;
+    Texture exitButtonImg;
     Vector2 imagePosition;
 
     // control button placement on the menu
@@ -54,6 +61,9 @@ public class GameScreen implements Screen {
     float basicTowerY = Gdx.graphics.getHeight() - 300;
     float longTowerY = Gdx.graphics.getHeight() - 450;
     float strongTowerY = Gdx.graphics.getHeight() - 600;
+    float saveX = Gdx.graphics.getWidth() -230;
+    float saveY = Gdx.graphics.getHeight() - 1040;
+    float exitX = Gdx.graphics.getWidth() - 124;
 
     boolean isSelectingTower;
     boolean isPlaced;
@@ -102,14 +112,44 @@ public class GameScreen implements Screen {
         strongTower.x = menuTowerX;
         strongTower.y = strongTowerY;
 
+        saveButtonImg = new Texture(Gdx.files.internal("GameScreenSaveImg.png"));
+        saveButton = new Rectangle();
+        saveButton.width = 96;
+        saveButton.height = 64;
+        saveButton.x = saveX;
+        saveButton.y = saveY;
+
+        exitButtonImg = new Texture(Gdx.files.internal("GameScreenExitImg.png"));
+        exitButton = new Rectangle();
+        exitButton.width = 96;
+        exitButton.height = 64;
+        exitButton.x = exitX;
+        exitButton.y = saveY;
+
+
         //Setup Default Enemy
         enemies = new Array<Enemy>();
         bullets = new Array<Bullet>();
 
+        FileHandle waveData = Gdx.files.local("WaveData");
+        FileHandle moneyData = Gdx.files.local("MoneyData");
+        FileHandle healthData = Gdx.files.local("HealthData");
+
+
+        String waveD = waveData.readString();
+        String moneyD = moneyData.readString();
+        String healthD = healthData.readString();
+
+        int saveWave = Integer.parseInt(waveD);
+        int saveMoney = Integer.parseInt(moneyD);
+        int saveHealth = Integer.parseInt(healthD);
+
+
+
         timeBetweenEnemySpawns = 1000000000;
-        wave = 1;
-        money = 50;
-        playerHealth = 200;
+        wave = saveWave;
+        money = saveMoney;
+        playerHealth = saveHealth;
 
         towers = new Array<Tower>();
 
@@ -135,6 +175,10 @@ public class GameScreen implements Screen {
         // tell the SpriteBatch to render in the
         // coordinate system specified by the camera.
         game.batch.setProjectionMatrix(camera.combined);
+
+        FileHandle waveData = Gdx.files.local("WaveData");
+        FileHandle moneyData = Gdx.files.local("MoneyData");
+        FileHandle healthData = Gdx.files.local("HealthData");
 
         game.batch.begin();
         game.batch.draw(background, 0, 0, 1920, 1080);
@@ -190,6 +234,9 @@ public class GameScreen implements Screen {
         game.batch.draw(baseTowerImg, menuTowerX, basicTowerY);
         game.batch.draw(strongTowerImg, menuTowerX, strongTowerY);
         game.batch.draw(longTowerImg, menuTowerX, longTowerY);
+        game.batch.draw(saveButtonImg, saveX, saveY);
+        game.batch.draw(exitButtonImg, exitX, saveY);
+
 
         if(isSelectingTower) {
             game.batch.draw(tempTowerDisplay, imagePosition.x, imagePosition.y);
@@ -206,6 +253,15 @@ public class GameScreen implements Screen {
         if (Gdx.input.justTouched()) {
             int x = Gdx.input.getX();
             int y = Gdx.graphics.getHeight() - Gdx.input.getY();
+
+            if(exitButton.contains(x, y)){
+                Gdx.app.exit();
+            }
+            if(saveButton.contains(x, y)){
+                waveData.writeString(Integer.toString(wave), false);
+                moneyData.writeString(Integer.toString(totalMoney), false);
+                healthData.writeString(Integer.toString(playerHealth), false);
+            }
 
             if (baseTower.contains(x, y) && money >= 10) {
                 towerSelector = 1;
@@ -267,6 +323,7 @@ public class GameScreen implements Screen {
             }
             if (enemy.getHealth() <= 0) {
                 money += enemy.getMoneyToDrop();
+                totalMoney += enemy.getMoneyToDrop();
                 enemyIterator.remove();
                 break;
             }

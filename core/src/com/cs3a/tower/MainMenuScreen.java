@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.files.FileHandle;
 
 import java.awt.*;
 
@@ -27,6 +28,7 @@ public class MainMenuScreen implements Screen{
     Texture exitImg;
 
     Texture headerImg;
+
 
 
 
@@ -64,11 +66,19 @@ public class MainMenuScreen implements Screen{
         headerImg = new Texture(Gdx.files.internal("Header.png"));
 
 
+
+
+
+
     }
 
     @Override
     public void render(float delta){
         ScreenUtils.clear(0,0,0.2f, 1);
+
+        FileHandle waveData = Gdx.files.local("WaveData");
+        FileHandle moneyData = Gdx.files.local("MoneyData");
+        FileHandle healthData = Gdx.files.local("HealthData");
 
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
@@ -80,16 +90,31 @@ public class MainMenuScreen implements Screen{
         game.batch.draw(exitImg, 832, 200);
         game.batch.end();
 
-        if(Gdx.input.isTouched() && Gdx.input.getX() > 831 && Gdx.input.getX() < 1087
-            && Gdx.input.getY() > 500 && Gdx.input.getY() < 630){
-            game.setScreen(new GameScreen(game));
-            dispose();
+        if(Gdx.input.isTouched()){
+            int x = Gdx.input.getX();
+            int y = Gdx.graphics.getHeight() - Gdx.input.getY();
+
+            if(newGameBox.contains(x, y)){
+                waveData.writeString("1", false);
+                moneyData.writeString("50", false);
+                healthData.writeString("200", false);
+                game.setScreen(new GameScreen(game));
+                dispose();
+            }
+
+            if(continueBox.contains(x, y)){
+                game.setScreen(new GameScreen(game));
+                dispose();
+            }
+
+            if(exitBox.contains(x, y)){
+                Gdx.app.exit();
+            }
 
         }
-        if(Gdx.input.isTouched() && Gdx.input.getX() > 831 && Gdx.input.getX() < 1087
-                && Gdx.input.getY() > 770 && Gdx.input.getY() < 870){
-            Gdx.app.exit();
-        }
+
+
+
     }
 
     @Override
