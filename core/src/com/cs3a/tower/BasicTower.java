@@ -47,8 +47,4 @@ public class BasicTower extends Tower {
         }
     }
 
-    Texture getTowerImg()
-    {
-       return towerTexture;
-    }
 }

@@ -52,8 +52,4 @@ public class LongTower extends Tower {
         }
     }
 
-    Texture getTowerImg()
-    {
-        return towerTexture;
-    }
 }

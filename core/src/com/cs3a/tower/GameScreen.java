@@ -124,6 +124,7 @@ public class GameScreen implements Screen {
         upgrade.x = menuTowerX + 40;
         upgrade.y = Gdx.graphics.getHeight() - 850;
 
+
         isPlaced = true;
         selected = false;
 
@@ -261,16 +262,16 @@ public class GameScreen implements Screen {
 
                 if(sell.contains(x,y))
                 {
-                    money += tower.price + (int) (tower.price / tower.upgradePriceMultiplier);
+                    money += shownTower.price + (int) (shownTower.price / shownTower.upgradePriceMultiplier * shownTower.upgradeLevel);
                     selected = false;
-                    towerIterator.remove();
+                    towers.removeValue(shownTower,true);
                     break;
                 }
 
-                if(upgrade.contains(x,y) && tower.upgradeLevel != 3  &&tower.upgradeLevel > -1 && money > (tower.price * tower.upgradePriceMultiplier))
+                if(upgrade.contains(x,y) && shownTower.upgradeLevel != 3  &&shownTower.upgradeLevel > -1 && money > (tower.timeSinceLastAttack * tower.upgradePriceMultiplier))
                 {
-                    money -= (int) (tower.price * tower.upgradePriceMultiplier);
-                    tower.upgrade();
+                    money -= (int) (shownTower.price * shownTower.upgradePriceMultiplier);
+                    shownTower.upgrade();
 
                 }
             }
