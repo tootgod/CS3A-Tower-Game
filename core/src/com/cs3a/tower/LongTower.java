@@ -50,6 +50,6 @@ public class LongTower extends Tower {
             default:
                 break;
         }
-
     }
+
 }

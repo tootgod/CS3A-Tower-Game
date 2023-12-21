@@ -107,4 +107,9 @@ public abstract class Tower
     }
 
     public abstract void upgrade();
+
+    Texture getTowerImg()
+    {
+        return towerTexture;
+    }
 }
