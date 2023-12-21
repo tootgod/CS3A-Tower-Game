@@ -107,7 +107,7 @@ public class GameScreen implements Screen {
         baseTower.x = menuTowerX;
         baseTower.y = basicTowerY;
 
-        longTowerImg = new Texture(Gdx.files.internal("longTower.png"));
+        longTowerImg = new Texture(Gdx.files.internal("LongTower.png"));
         longTower = new Rectangle();
         longTower.width = 64;
         longTower.height = 64;

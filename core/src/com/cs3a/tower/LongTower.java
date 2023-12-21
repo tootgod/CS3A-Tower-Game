@@ -1,5 +1,6 @@
 package com.cs3a.tower;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
@@ -7,7 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 public class LongTower extends Tower {
     public LongTower(){
         super(1.5f);
-        towerTexture = new Texture("LongTower.png");
+        towerTexture = new Texture(Gdx.files.internal("LongTower.png"));
         interactionBox = new Rectangle();
         interactionBox.width = 64;
         interactionBox.height = 64;
