@@ -234,8 +234,6 @@ public class GameScreen implements Screen {
 
         if (Gdx.input.justTouched()) {
 
-
-
             int x = Gdx.input.getX();
             int y = Gdx.graphics.getHeight() - Gdx.input.getY();
             Rectangle test = new Rectangle(x - 32,y - 32, 64,64);
@@ -431,7 +429,7 @@ public class GameScreen implements Screen {
     }
 
 
-    // check bug for towerplacement
+
     private class TowerInputProcessor extends com.badlogic.gdx.InputAdapter
     {
             public boolean touchDown(int screenX, int screenY, int pointer, int button)
@@ -478,17 +476,6 @@ public class GameScreen implements Screen {
             }
             return true;
         }
-
-//        private void updateAreaWithTower(int[][] area, int screenX, int screenY, int towerWidth, int towerHeight) {
-//            // Update the area to denote the tower's placement
-//            for (int i = screenX - towerWidth ; i < screenX + towerWidth; i++) {
-//                for (int j = screenY - towerHeight - 7; j < screenY + towerHeight; j++) {
-//                    area[i][j] = -1;
-//                }
-//            }
-//            //map.showMap(screenX - towerWidth,screenY - towerHeight);
-//        }
-
 
         private int getSelectedTowerPrice() {
             switch (towerSelector) {
