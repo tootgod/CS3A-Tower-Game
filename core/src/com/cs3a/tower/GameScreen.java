@@ -288,14 +288,7 @@ public class GameScreen implements Screen {
 
             int x = Gdx.input.getX();
             int y = Gdx.graphics.getHeight() - Gdx.input.getY();
-            Rectangle test = new Rectangle(x - 32,y - 32, 64,64);
-            canPlace = true;
 
-            for(Tower tempTower: towers){
-                if(tempTower.interactionBox.overlaps(test)){
-                    canPlace = false;
-                }
-            }
 
             if(exitButton.contains(x, y)){
                 Gdx.app.exit();
@@ -504,6 +497,14 @@ public class GameScreen implements Screen {
 
             int towerWidth = 32;
             int towerHeight = 32;
+            Rectangle test = new Rectangle(Gdx.input.getX() - 32,Gdx.graphics.getHeight() - Gdx.input.getY() - 32, 64,64);
+            canPlace = true;
+
+            for(Tower tempTower: towers){
+                if(tempTower.interactionBox.overlaps(test)){
+                    canPlace = false;
+                }
+            }
 
             if (money >= getSelectedTowerPrice()) {
                 if (screenX >= towerWidth && screenX < mapWidth - towerWidth * 2 && screenY >= towerHeight && screenY < mapHeight - towerHeight * 2 &&
