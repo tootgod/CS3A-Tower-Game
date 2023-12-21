@@ -112,17 +112,17 @@ public class GameScreen implements Screen {
 
         sellButton = new Texture(Gdx.files.internal("Sell.png"));
         sell = new Rectangle();
-        sell.width = 64;
-        sell.height = 32;
-        sell.x = menuTowerX - 40;
-        sell.y = Gdx.graphics.getHeight() - 850;
+        sell.width = 196;
+        sell.height = 64;
+        sell.x = menuTowerX - 80 ;
+        sell.y = Gdx.graphics.getHeight() - 900;
 
         upgradeButton = new Texture(Gdx.files.internal("Upgrade.png"));
         upgrade = new Rectangle();
-        upgrade.width = 64;
-        upgrade.height = 32;
-        upgrade.x = menuTowerX + 40;
-        upgrade.y = Gdx.graphics.getHeight() - 850;
+        upgrade.width = 196;
+        upgrade.height = 64;
+        upgrade.x = menuTowerX - 80;
+        upgrade.y = Gdx.graphics.getHeight() - 975;
 
 
         isPlaced = true;
@@ -216,14 +216,17 @@ public class GameScreen implements Screen {
 
         // For displaying a specific tower is selected
         if(selected) {
-            game.font.draw(game.batch,"Level: " + shownTower.upgradeLevel,menuTowerX, Gdx.graphics.getHeight() - 670);
-            game.batch.draw(displayTower, menuTowerX, Gdx.graphics.getHeight() - 750);
+            game.font.setColor(Color.WHITE);
+            game.font.draw(game.batch,"Level: " + (shownTower.upgradeLevel + 1) ,menuTowerX , Gdx.graphics.getHeight() - 720);
+            game.batch.draw(displayTower, menuTowerX, Gdx.graphics.getHeight() - 800);
 
             if(shownTower.upgradeLevel < 3)
-                game.font.draw(game.batch,"Price: "  + (int)(shownTower.price * shownTower.upgradePriceMultiplier), menuTowerX,Gdx.graphics.getHeight() - 760);
-
-            game.batch.draw(sellButton, menuTowerX - 32, Gdx.graphics.getHeight() - 850);
-            game.batch.draw(upgradeButton, menuTowerX + 32, Gdx.graphics.getHeight() - 850);
+            {
+                game.font.setColor(((int) (shownTower.price * shownTower.upgradePriceMultiplier) < money) ? Color.GREEN : Color.RED);
+                game.font.draw(game.batch, "Price: " + (int) (shownTower.price * shownTower.upgradePriceMultiplier), menuTowerX, Gdx.graphics.getHeight() - 810);
+            }
+            game.batch.draw(sellButton, menuTowerX - 80, Gdx.graphics.getHeight() - 900);
+            game.batch.draw(upgradeButton, menuTowerX - 80, Gdx.graphics.getHeight() - 975);
         }
         game.batch.end();
 
@@ -264,15 +267,21 @@ public class GameScreen implements Screen {
                 {
                     money += shownTower.price + (int) (shownTower.price / shownTower.upgradePriceMultiplier * shownTower.upgradeLevel);
                     selected = false;
+
+                    System.out.println("x: " + shownTower.interactionBox.x + ", y:" + shownTower.interactionBox.y);
+
+                    map.resetPlayableArea(shownTower);
                     towers.removeValue(shownTower,true);
                     break;
                 }
 
-                if(upgrade.contains(x,y) && shownTower.upgradeLevel != 3  &&shownTower.upgradeLevel > -1 && money > (tower.timeSinceLastAttack * tower.upgradePriceMultiplier))
+                if(upgrade.contains(x,y) && shownTower.upgradeLevel != 3  &&shownTower.upgradeLevel > -1 && money > (tower.price * tower.upgradePriceMultiplier))
                 {
-                    money -= (int) (shownTower.price * shownTower.upgradePriceMultiplier);
-                    shownTower.upgrade();
-
+                    if (money - (int) (shownTower.price * shownTower.upgradePriceMultiplier) > 0)
+                    {
+                        money -= (int) (shownTower.price * shownTower.upgradePriceMultiplier);
+                        shownTower.upgrade();
+                    }
                 }
             }
 
@@ -409,9 +418,11 @@ public class GameScreen implements Screen {
         }
     }
 
+
     // check bug for towerplacement
-    private class TowerInputProcessor extends com.badlogic.gdx.InputAdapter {
-        public boolean touchDown(int screenX, int screenY, int pointer, int button)
+    private class TowerInputProcessor extends com.badlogic.gdx.InputAdapter
+    {
+            public boolean touchDown(int screenX, int screenY, int pointer, int button)
         {
             int[][] area = map.getMap();
             int mapWidth = area.length;
@@ -462,8 +473,10 @@ public class GameScreen implements Screen {
                 for (int j = screenY - towerHeight; j < screenY + towerHeight; j++) {
                     area[i][j] = -1;
                 }
+                System.out.println();
             }
         }
+
 
         private int getSelectedTowerPrice() {
             switch (towerSelector) {

@@ -67,6 +67,23 @@ public class TiledMap
         return tiles;
     }
 
+    public void resetPlayableArea(Tower tower) {
+        int towerWidth = 30;
+        int towerHeight = 30;
+
+        int x = (int) (tower.interactionBox.x) + 2;
+        int y = -((int) (tower.interactionBox.y) - tiles[0].length) - (int) tower.interactionBox.height + 2;
+
+        for (int i = x; i < x + towerWidth * 2; i++) {
+            for (int j = y; j < y + towerHeight * 2; j++) {
+                if (i >= 0 && i < tiles.length && j >= 0 && j < tiles[0].length) {
+                    tiles[i][j] = 1;
+                }
+            }
+            System.out.println();
+        }
+    }
+
     // was in place purely for viewing behind the scenes and debugging
     public void showMap()
     {
