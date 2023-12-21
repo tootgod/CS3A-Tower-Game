@@ -173,6 +173,7 @@ public class GameScreen implements Screen {
         game.font.setColor(Color.BLACK);
         for (Tower tower : towers) {
             game.batch.draw(tower.getTowerTexture(), tower.interactionBox.x, tower.interactionBox.y, tower.interactionBox.width, tower.interactionBox.height);
+            game.font.draw(game.batch, ""+tower.upgradeLevel, tower.interactionBox.x ,tower.interactionBox.y+ 10 );
 
         }
         for (Bullet bullet : bullets) {
@@ -218,7 +219,7 @@ public class GameScreen implements Screen {
         // For displaying a specific tower is selected
         if(selected) {
             game.font.setColor(Color.WHITE);
-            game.font.draw(game.batch,"Level: " + (shownTower.upgradeLevel + 1) ,menuTowerX , Gdx.graphics.getHeight() - 720);
+            game.font.draw(game.batch,"Level: " + (shownTower.upgradeLevel ) ,menuTowerX , Gdx.graphics.getHeight() - 720);
             game.batch.draw(displayTower, menuTowerX, Gdx.graphics.getHeight() - 800);
 
             if(shownTower.upgradeLevel < 3)
@@ -273,24 +274,26 @@ public class GameScreen implements Screen {
                     shownTower = tower;
                 }
 
-                if(sell.contains(x,y))
+                if(sell.contains(x,y) && selected)
                 {
                     money += shownTower.price + (int) (shownTower.price / shownTower.upgradePriceMultiplier * shownTower.upgradeLevel);
                     selected = false;
 
                     System.out.println("x: " + shownTower.interactionBox.x + ", y:" + shownTower.interactionBox.y);
-
+                    canPlace = false;
                     //map.resetPlayableArea(shownTower);
                     towers.removeValue(shownTower,true);
                     break;
+
                 }
 
-                if(upgrade.contains(x,y) && shownTower.upgradeLevel != 3  &&shownTower.upgradeLevel > -1 && money > (tower.price * tower.upgradePriceMultiplier))
+                if(upgrade.contains(x,y) && shownTower.upgradeLevel != 3  &&shownTower.upgradeLevel > -1 && money > (tower.price * tower.upgradePriceMultiplier) && selected)
                 {
                     if (money - (int) (shownTower.price * shownTower.upgradePriceMultiplier) > 0)
                     {
                         money -= (int) (shownTower.price * shownTower.upgradePriceMultiplier);
                         shownTower.upgrade();
+                        canPlace = false;
                     }
                 }
             }
