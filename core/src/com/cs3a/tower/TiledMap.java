@@ -67,16 +67,30 @@ public class TiledMap
         return tiles;
     }
 
+
     // was in place purely for viewing behind the scenes and debugging
-    public void showMap()
-    {
-        for (int[] tile : tiles) {
-            for (int y = 0; y < tiles[0].length; y++) {
-                System.out.print(tile[y] + " ");
-            }
-            System.out.println();
-        }
-    }
+//    public void showMap()
+//    {
+//        for (int[] tile : tiles) {
+//            for (int y = 0; y < tiles[0].length; y++) {
+//                System.out.print(tile[y] + " ");
+//            }
+//            System.out.println();
+//        }
+//    }
+//
+//    public void showMap(int x, int y) {
+//        for (int i = x; i < x + 64; i++) {
+//            for (int j = y; j < y + 64; j++) {
+//                if (i >= 0 && i < tiles.length && j >= 0 && j < tiles[0].length) {
+//                    System.out.print(tiles[i][j]);
+//                }
+//            }
+//            System.out.println("");
+//        }
+//        System.out.println("");
+//    }
+
 
 }
 

@@ -48,4 +48,5 @@ public class StrongTower extends Tower{
                 break;
         }
     }
+
 }
