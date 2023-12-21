@@ -33,6 +33,7 @@ public class GameScreen implements Screen {
     Rectangle sell;
     Texture displayTower;
     boolean selected;
+    boolean canPlace = true;
 
     Tower shownTower;
     TiledMap map;
@@ -232,8 +233,19 @@ public class GameScreen implements Screen {
 
 
         if (Gdx.input.justTouched()) {
+
+
+
             int x = Gdx.input.getX();
             int y = Gdx.graphics.getHeight() - Gdx.input.getY();
+            Rectangle test = new Rectangle(x - 32,y - 32, 64,64);
+            canPlace = true;
+
+            for(Tower tempTower: towers){
+                if(tempTower.interactionBox.overlaps(test)){
+                    canPlace = false;
+                }
+            }
 
             if (baseTower.contains(x, y) && money >= 10) {
                 towerSelector = 1;
@@ -270,7 +282,7 @@ public class GameScreen implements Screen {
 
                     System.out.println("x: " + shownTower.interactionBox.x + ", y:" + shownTower.interactionBox.y);
 
-                    map.resetPlayableArea(shownTower);
+                    //map.resetPlayableArea(shownTower);
                     towers.removeValue(shownTower,true);
                     break;
                 }
@@ -288,7 +300,7 @@ public class GameScreen implements Screen {
         }
 
         if (isSelectingTower) {
-            imagePosition.set(Gdx.input.getX() - getImageWidth() / 2, Gdx.graphics.getHeight() - Gdx.input.getY() - getImageHeight() / 2);
+            imagePosition.set(Gdx.input.getX() - getImageWidth() / 2, Gdx.graphics.getHeight() - Gdx.input.getY() - getImageHeight() / 2 + 14);
         }
 
         if(Gdx.input.isTouched() && isPlaced)
@@ -428,8 +440,8 @@ public class GameScreen implements Screen {
             int mapWidth = area.length;
             int mapHeight = area[0].length;
 
-            int towerWidth = 30;
-            int towerHeight = 30;
+            int towerWidth = 32;
+            int towerHeight = 32;
 
             if (money >= getSelectedTowerPrice()) {
                 if (screenX >= towerWidth && screenX < mapWidth - towerWidth * 2 && screenY >= towerHeight && screenY < mapHeight - towerHeight * 2 &&
@@ -439,13 +451,12 @@ public class GameScreen implements Screen {
                     camera.unproject(touchPos);
                     Tower tower = createSelectedTower();
 
-                    if (canPlaceTower(area, screenX, screenY, towerWidth, towerHeight)) {
+                    if (canPlaceTower(area, screenX, screenY, towerWidth, towerHeight)  && canPlace) {
                         money -= tower.price;
                         tower.setPosition(touchPos.x - 32, touchPos.y - 32);
                         towers.add(tower);
 
                         // Prevent towers from overlapping and update area
-                        updateAreaWithTower(area, screenX, screenY, towerWidth, towerHeight);
                         isPlaced = true;
                         return isPlaced;
                     }
@@ -457,6 +468,7 @@ public class GameScreen implements Screen {
 
         private boolean canPlaceTower(int[][] area, int screenX, int screenY, int towerWidth, int towerHeight) {
             // Check if the tower placement is within map boundaries and not on the pathway
+            //map.showMap(screenX - towerWidth,screenY - towerHeight);
             for (int i = screenX - towerWidth; i < screenX + towerWidth; i++) {
                 for (int j = screenY - towerHeight; j < screenY + towerHeight; j++) {
                     if (area[i][j] != 1) {
@@ -467,15 +479,15 @@ public class GameScreen implements Screen {
             return true;
         }
 
-        private void updateAreaWithTower(int[][] area, int screenX, int screenY, int towerWidth, int towerHeight) {
-            // Update the area to denote the tower's placement
-            for (int i = screenX - towerWidth; i < screenX + towerWidth; i++) {
-                for (int j = screenY - towerHeight; j < screenY + towerHeight; j++) {
-                    area[i][j] = -1;
-                }
-                System.out.println();
-            }
-        }
+//        private void updateAreaWithTower(int[][] area, int screenX, int screenY, int towerWidth, int towerHeight) {
+//            // Update the area to denote the tower's placement
+//            for (int i = screenX - towerWidth ; i < screenX + towerWidth; i++) {
+//                for (int j = screenY - towerHeight - 7; j < screenY + towerHeight; j++) {
+//                    area[i][j] = -1;
+//                }
+//            }
+//            //map.showMap(screenX - towerWidth,screenY - towerHeight);
+//        }
 
 
         private int getSelectedTowerPrice() {
