@@ -1,3 +1,11 @@
+/*
+Kyler Geesink
+Gregory Shane
+William Woods
+Daniel Roberts
+Garron Grim????(I'm sorry i never got your last name)
+*/
+
 package com.cs3a.tower;
 
 import com.badlogic.gdx.Gdx;
@@ -35,7 +43,8 @@ public class BasicTower extends Tower {
                 break;
             case 1:
                 price *= upgradePriceMultiplier;
-                upgradeLevel++;attackTimer *= 0.85f;
+                upgradeLevel++;
+                attackTimer *= 0.85f;
                 bulletSpeed += 10f;
                 break;
             case 2:

@@ -1,3 +1,11 @@
+/*
+Kyler Geesink
+Gregory Shane
+William Woods
+Daniel Roberts
+Garron Grim????(I'm sorry i never got your last name)
+*/
+
 // Purpose:
 // This class is used to create a map behind the game screen of the grass and path based off pixel color.
 // Creates a 2D array that helps with colors over the tower placement on the game screen.

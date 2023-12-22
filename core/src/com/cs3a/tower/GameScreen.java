@@ -1,3 +1,12 @@
+/*
+Kyler Geesink
+Gregory Shane
+William Woods
+Daniel Roberts
+Garron Grim????(I'm sorry i never got your last name)
+*/
+
+
 package com.cs3a.tower;
 
 import java.util.Iterator;
